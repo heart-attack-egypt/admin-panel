@@ -1,0 +1,73 @@
+# Node.js dependencies
+node_modules/
+build/
+.env
+.env.development
+.env.staging
+.env.production
+.env.test
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Temporary files
+tmp/
+temp/
+*.swp
+
+# Coverage directory used by testing tools
+coverage/
+
+# Build directories and files
+dist/
+out/
+.build/
+
+# Ignore all local env files except sample
+!.env.sample
+
+# Ignore yarn lockfile
+yarn.lock
+
+# Ignore eslint cache
+.eslintcache
+
+# Ignore build artifacts
+build/
+.DS_Store
+
+# Ignore Prettier files
+.prettierignore
+.prettierrc.js
+
+# Ignore ESLint files
+.eslintignore
+.eslintrc.json
+
+# Ignore Docker files
+Dockerfile
+
+# Ignore IDE-specific files
+.idea/
+
+# Ignore Sentry files
+.sentryclirc
+
+# Ignore miscellaneous
+!.github
