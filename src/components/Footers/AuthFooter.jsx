@@ -16,29 +16,23 @@ export default function AuthFooter(props) {
           bgcolor: 'transparent'
         }}
         showLabels>
-        <Typography className={classes.text}>©2022</Typography>
+        <Typography className={classes.text}>©2024</Typography>
 
         <Link
           className={classes.link}
           href="https://multivendor.enatega.com/"
           target="_blank"
           underline="none">
-          Enatega Multivendor
+          HeartAttack Multivendor
         </Link>
         <Link
           className={classes.link}
-          href="https://ninjascode.com/about-us/"
+          href="https://www.facebook.com/HeartAttackEg/"
           target="_blank"
           underline="none">
           About Us
         </Link>
-        <Link
-          className={classes.link}
-          href="https://enatega.com/blog/"
-          target="_blank"
-          underline="none">
-          Blog
-        </Link>
+
       </BottomNavigation>
     </Box>
   )

@@ -3,7 +3,7 @@ import { useQuery, useMutation, gql } from '@apollo/client'
 import { withTranslation } from 'react-i18next'
 // core components
 import Header from '../components/Headers/Header'
-import { getRestaurantDetail, deleteFood } from '../apollo'
+import { getRestaurantDetail, deleteFood, toggleFoodStatus } from '../apollo'
 import FoodComponent from '../components/Food/Food'
 import CustomLoader from '../components/Loader/CustomLoader'
 import DataTable from 'react-data-table-component'
@@ -19,7 +19,8 @@ import {
   Modal,
   Paper,
   Typography,
-  ListItemIcon
+  ListItemIcon,
+  Switch
 } from '@mui/material'
 import { customStyles } from '../utils/tableCustomStyles'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
@@ -37,17 +38,24 @@ const DELETE_FOOD = gql`
 `
 const Food = props => {
   const { t } = props
-  const {PAID_VERSION} = ConfigurableValues()
+  const { PAID_VERSION } = ConfigurableValues()
   const [editModal, setEditModal] = useState(false)
   const [food, setFood] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  // const [anchorEl, setAnchorEl] = React.useState(null)
+  // const open = Boolean(anchorEl)
+  // const [selectedFoodId, setSelectedFoodId] = useState(null);
+  // const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const onChangeSearch = e => setSearchQuery(e.target.value)
   const restaurantId = localStorage.getItem('restaurantId')
 
   const [mutate, { loading }] = useMutation(DELETE_FOOD, {
     refetchQueries: [{ query: GET_FOODS, variables: { id: restaurantId } }]
   })
+  const [toggleStatus] = useMutation(gql`${toggleFoodStatus}`, {
+    refetchQueries: [{ query: gql`${GET_FOODS}`, variables: { id: restaurantId } }],
+  });
   const { data, error: errorQuery, loading: loadingQuery, refetch } = useQuery(
     GET_FOODS,
     {
@@ -56,6 +64,33 @@ const Food = props => {
       }
     }
   )
+  // const handleToggleStatus = (foodId, currentStatus) => {
+  //   toggleStatus({ variables: { id: foodId, isActive: !currentStatus } });
+  // };
+  // const handleToggleStatus = async(foodId, currentStatus) => {
+  //   try {
+  //     const response = await toggleStatus({
+  //       variables: { id: foodId, isActive: !currentStatus },
+  //     });
+  //     console.log('Mutation response:', response); // Log the response to inspect it
+  //   } catch (error) {
+  //     console.error('Mutation error:', error);
+  //   }
+  // };
+  const handleToggleStatus = async (restaurantId, foodId, currentStatus) => {
+    console.log('Toggling status for Food ID:', foodId);
+    console.log('Toggling status for restaurantId:', restaurantId);
+    try {
+      const response = await toggleStatus({
+        variables: { restaurantId, foodId, isActive: !currentStatus },
+      });
+      console.log('Mutation response:', response);
+    } catch (error) {
+      console.error('Mutation error:', error);
+    }
+  };
+
+
   const toggleModal = food => {
     setEditModal(!editModal)
     setFood(food)
@@ -116,11 +151,102 @@ const Food = props => {
       )
     },
     {
+      name: 'Enabled',
+      cell: row => (
+        <Switch
+          checked={row.isActive}
+          onChange={() => handleToggleStatus(restaurantId, row._id, row.isActive)}
+          color="primary"
+        />
+      ),
+    },
+    {
       name: t('Action'),
-      cell: row => <>{actionButtons(row)}</>
-    }
+      cell: row => <>{ActionButtons(row)}</>
+    },
+
+
   ]
-  const actionButtons = row => {
+  // const ActionButtons = row => {
+
+  //   const handleClick = (event, foodId, categoryId) => {
+  //     setAnchorEl(event.currentTarget);
+  //     setSelectedFoodId(foodId); // Store the selected food's ID
+  //     setSelectedCategoryId(categoryId); // Store the selected food's category ID
+  //   };
+  //   const handleClose = () => {
+  //     setAnchorEl(null)
+  //   }
+  //   return (
+  //     <>
+  //       <div>
+  //         <IconButton
+  //           aria-label="more"
+  //           id="long-button"
+  //           aria-haspopup="true"
+  //           onClick={(event) => handleClick(event, row._id, row.categoryId)}>
+  //           <MoreVertIcon fontSize="small" />
+  //         </IconButton>
+  //         <Paper>
+  //           <Menu
+  //             id="long-menu"
+  //             MenuListProps={{
+  //               'aria-labelledby': 'long-button'
+  //             }}
+  //             anchorEl={anchorEl}
+  //             open={open}
+  //             onClose={handleClose}>
+  //             <MenuItem
+  //               onClick={e => {
+  //                 e.preventDefault()
+  //                 if (PAID_VERSION)
+  //                   toggleModal(row)
+  //                 else {
+  //                   setIsOpen(true)
+  //                   setTimeout(() => {
+  //                     setIsOpen(false)
+  //                   }, 5000)
+  //                 }
+  //               }}
+  //               style={{ height: 25 }}>
+  //               <ListItemIcon>
+  //                 <EditIcon fontSize="small" style={{ color: 'green' }} />
+  //               </ListItemIcon>
+  //               <Typography color="green">{t('Edit')}</Typography>
+  //             </MenuItem>
+  //             <MenuItem
+  //               onClick={e => {
+  //                 e.preventDefault()
+  //                 if (PAID_VERSION)
+  //                   mutate({
+  //                     variables: {
+  //                       id: selectedFoodId,
+  //                       restaurant: restaurantId,
+  //                       categoryId: selectedCategoryId
+  //                     }
+  //                   })
+  //                 else {
+  //                   setIsOpen(true)
+  //                   setTimeout(() => {
+  //                     setIsOpen(false)
+  //                   }, 5000)
+  //                 }
+  //                 handleClose(); // Close the menu
+  //               }}
+  //               style={{ height: 25 }}>
+  //               <ListItemIcon>
+  //                 <DeleteIcon fontSize="small" style={{ color: 'red' }} />
+  //               </ListItemIcon>
+  //               <Typography color="red">{t('Delete')}</Typography>
+  //             </MenuItem>
+  //           </Menu>
+  //         </Paper>
+  //       </div>
+  //     </>
+  //   )
+  // }
+
+  const ActionButtons = row => {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
     const handleClick = event => {
@@ -151,14 +277,14 @@ const Food = props => {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                  if(PAID_VERSION)
-                  toggleModal(row)
-                else{
-                  setIsOpen(true)
-                  setTimeout(() => {
-                    setIsOpen(false)
-                  }, 5000)
-                }
+                  if (PAID_VERSION)
+                    toggleModal(row)
+                  else {
+                    setIsOpen(true)
+                    setTimeout(() => {
+                      setIsOpen(false)
+                    }, 5000)
+                  }
                 }}
                 style={{ height: 25 }}>
                 <ListItemIcon>
@@ -169,20 +295,20 @@ const Food = props => {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                  if(PAID_VERSION)
-                  mutate({
-                    variables: {
-                      id: row._id,
-                      restaurant: restaurantId,
-                      categoryId: row.categoryId
-                    }
-                  })
-                  else{
-                  setIsOpen(true)
-                  setTimeout(() => {
-                    setIsOpen(false)
-                  }, 5000)
-                }
+                  if (PAID_VERSION)
+                    mutate({
+                      variables: {
+                        id: row._id,
+                        restaurant: restaurantId,
+                        categoryId: row.categoryId
+                      }
+                    })
+                  else {
+                    setIsOpen(true)
+                    setTimeout(() => {
+                      setIsOpen(false)
+                    }, 5000)
+                  }
                 }}
                 style={{ height: 25 }}>
                 <ListItemIcon>
@@ -232,12 +358,12 @@ const Food = props => {
     searchQuery.length < 3
       ? foodsList(data && data.restaurant.categories)
       : foodsList(data && data.restaurant.categories).filter(food => {
-          return (
-            food.title.toLowerCase().search(regex) > -1 ||
-            food.description.toLowerCase().search(regex) > -1 ||
-            food.category.toLowerCase().search(regex) > -1
-          )
-        })
+        return (
+          food.title.toLowerCase().search(regex) > -1 ||
+          food.description.toLowerCase().search(regex) > -1 ||
+          food.category.toLowerCase().search(regex) > -1
+        )
+      })
   const globalClasses = useGlobalStyles()
 
   return (

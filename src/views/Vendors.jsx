@@ -39,12 +39,14 @@ const DELETE_VENDOR = gql`
 `
 const Vendors = props => {
   const theme = useTheme()
-  const {PAID_VERSION} = ConfigurableValues()
+  const { PAID_VERSION } = ConfigurableValues()
   const { t } = props
   const [editModal, setEditModal] = useState(false)
   const [vendors, setVendor] = useState(null)
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  // const [anchorEl, setAnchorEl] = useState(null)
+  // const open = Boolean(anchorEl)
   const onChangeSearch = e => setSearchQuery(e.target.value)
   const golbalClasses = useGlobalStyles()
 
@@ -66,9 +68,9 @@ const Vendors = props => {
     searchQuery.length < 3
       ? data && data.vendors
       : data &&
-        data.vendors.filter(vendor => {
-          return vendor.email.toLowerCase().search(regex) > -1
-        })
+      data.vendors.filter(vendor => {
+        return vendor.email.toLowerCase().search(regex) > -1
+      })
 
   const toggleModal = vendor => {
     setEditModal(!editModal)
@@ -104,11 +106,11 @@ const Vendors = props => {
     },
     {
       name: t('Action'),
-      cell: row => <>{actionButtons(row)}</>
+      cell: row => <>{ActionButtons(row)}</>
     }
   ]
 
-  const actionButtons = row => {
+  const ActionButtons = row => {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
     const handleClick = event => {
@@ -163,14 +165,14 @@ const Vendors = props => {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                  if(PAID_VERSION)
-                  toggleModal(row);
-                else{
-                  setIsOpen(true)
-                  setTimeout(() => {
-                    setIsOpen(false)
-                  }, 5000)
-                }
+                  if (PAID_VERSION)
+                    toggleModal(row);
+                  else {
+                    setIsOpen(true)
+                    setTimeout(() => {
+                      setIsOpen(false)
+                    }, 5000)
+                  }
                 }}
                 style={{ height: 25 }}>
                 <ListItemIcon>
@@ -181,14 +183,14 @@ const Vendors = props => {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                 if(PAID_VERSION)
-                  mutate({ variables: { id: row._id } });
-                else{
-                  setIsOpen(true)
-                  setTimeout(() => {
-                    setIsOpen(false)
-                  }, 5000)
-                }
+                  if (PAID_VERSION)
+                    mutate({ variables: { id: row._id } });
+                  else {
+                    setIsOpen(true)
+                    setTimeout(() => {
+                      setIsOpen(false)
+                    }, 5000)
+                  }
                 }}
                 style={{ height: 25 }}>
                 <ListItemIcon>

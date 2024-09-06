@@ -43,6 +43,8 @@ const Cuisines = props => {
   const [editModal, setEditModal] = useState(false)
   const [cuisine, setCuisine] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  // const [anchorEl, setAnchorEl] = useState(null)
+  // const open = Boolean(anchorEl)
   const onChangeSearch = e => setSearchQuery(e.target.value)
   const [mutateEdit] = useMutation(EDIT_CUISINE)
   const [mutateDelete] = useMutation(DELETE_CUISINE, {
@@ -102,7 +104,7 @@ const Cuisines = props => {
     },
     {
       name: t('Action'),
-      cell: row => <>{actionButtons(row)}</>
+      cell: row => <>{ActionButtons(row)}</>
     }
   ]
   const regex =
@@ -111,11 +113,11 @@ const Cuisines = props => {
     searchQuery.length < 3
       ? data && data.cuisines
       : data &&
-        data.cuisines.filter(cuisine => {
-          return cuisine.name.toLowerCase().search(regex) > -1
-        })
+      data.cuisines.filter(cuisine => {
+        return cuisine.name.toLowerCase().search(regex) > -1
+      })
 
-  const actionButtons = row => {
+  const ActionButtons = row => {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
     const handleClick = event => {

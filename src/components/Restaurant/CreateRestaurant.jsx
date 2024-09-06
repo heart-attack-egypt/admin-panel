@@ -152,29 +152,57 @@ const CreateRestaurant = props => {
     fileReader.readAsDataURL(imgUrl)
   }
 
+  // const uploadImageToCloudinary = async(uploadType) => {
+  //   if (!uploadType) return;
+
+  //   const apiUrl = CLOUDINARY_UPLOAD_URL
+  //   const data = {
+  //     file: uploadType,
+  //     upload_preset: CLOUDINARY_FOOD
+  //   }
+  //   try {
+  //     const result = await fetch(apiUrl, {
+  //       body: JSON.stringify(data),
+  //       headers: {
+  //         'content-type': 'application/json'
+  //       },
+  //       method: 'POST'
+  //     })
+  //     const imageData = await result.json()
+  //     return imageData.secure_url
+  //   } catch (e) {
+  //     console.log(e)
+  //   }
+  // }
   const uploadImageToCloudinary = async(uploadType) => {
     if (!uploadType) return;
-
-    const apiUrl = CLOUDINARY_UPLOAD_URL
-    const data = {
-      file: uploadType,
-      upload_preset: CLOUDINARY_FOOD
-    }
+  
+    const apiUrl = CLOUDINARY_UPLOAD_URL;
+    console.log("apiUrl: ", apiUrl);
+    console.log("uploadType : ", uploadType)
+    // Extract the base64 part of the data URI
+    const base64Data = uploadType.replace(/^data:image\/\w+;base64,/, '');
+    
+    // Create a FormData object
+    const formData = new FormData();
+    formData.append('file', `data:image/jpeg;base64,${base64Data}`);
+    formData.append('upload_preset', CLOUDINARY_FOOD);
+  
+    console.log("image data: ", formData);
+  
     try {
       const result = await fetch(apiUrl, {
-        body: JSON.stringify(data),
-        headers: {
-          'content-type': 'application/json'
-        },
+        body: formData,
         method: 'POST'
-      })
-      const imageData = await result.json()
-      return imageData.secure_url
+      });
+      const imageData = await result.json();
+      console.log("image data in return: ", imageData);
+  
+      return imageData.secure_url;
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
-  }
-
+  };
   const onSubmitValidaiton = data => {
     const form = formRef.current
     const name = form.name.value

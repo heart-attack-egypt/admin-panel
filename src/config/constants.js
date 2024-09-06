@@ -7,8 +7,9 @@ const ConfigurableValues = () => {
   // const WS_SERVER_URL = 'wss://enatega-multivendor.up.railway.app'
   // const SERVER_URL = 'http://192.168.0.107:8001'
   // const WS_SERVER_URL = 'ws://192.168.0.107:8001'
-  const SERVER_URL = 'http://134.209.228.223:8001'
-  const WS_SERVER_URL = 'ws://134.209.228.223:8001'
+  const GRAPHQL_URL='https://heartattack.ws/graphql'
+  const SERVER_URL = 'https://heartattack.ws'
+  const WS_SERVER_URL = 'wss://heartattack.ws/graphql'
   const GOOGLE_MAPS_KEY = 'AIzaSyCrSZxTEqjc5qnyg4EghQVJz2I6KuEcuwg'
   const FIREBASE_KEY = configuration.firebaseKey
   const APP_ID = configuration.appId
@@ -18,8 +19,10 @@ const ConfigurableValues = () => {
   const MEASUREMENT_ID = configuration.measurementId
   const PROJECT_ID = configuration.projectId
   const SENTRY_DSN = configuration.dashboardSentryUrl
-  const CLOUDINARY_UPLOAD_URL = configuration.cloudinaryUploadUrl
-  const CLOUDINARY_FOOD = configuration.cloudinaryApiKey
+  const CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/dmn1wepuv/image/upload"
+  // const CLOUDINARY_UPLOAD_URL = configuration.cloudinaryUploadUrl
+  const CLOUDINARY_FOOD = "cmi6flk9"
+  // const CLOUDINARY_FOOD = configuration.cloudinaryApiKey
   const VAPID_KEY =
     'BOpVOtmawD0hzOR0F5NQTz_7oTlNVwgKX_EgElDnFuILsaE_jWYPIExAMIIGS-nYmy1lhf2QWFHQnDEFWNG_Z5w'
   const PAID_VERSION = configuration.isPaidVersion

@@ -294,27 +294,52 @@ function Food(props) {
     variationSetter([...variations])
   }
 
+  // const uploadImageToCloudinary = async() => {
+  //   if (imgMenu === '') return imgMenu
+  //   if (props.food && props.food.image === imgMenu) return imgMenu
+
+  //   const apiUrl = CLOUDINARY_UPLOAD_URL
+  //   const data = {
+  //     file: imgMenu,
+  //     upload_preset: CLOUDINARY_FOOD
+  //   }
+  //   try {
+  //     const result = await fetch(apiUrl, {
+  //       body: JSON.stringify(data),
+  //       headers: {
+  //         'content-type': 'application/json'
+  //       },
+  //       method: 'POST'
+  //     })
+  //     const imageData = await result.json()
+  //     return imageData.secure_url
+  //   } catch (e) {
+  //     console.log(e)
+  //   }
+  // }
+  
   const uploadImageToCloudinary = async() => {
     if (imgMenu === '') return imgMenu
     if (props.food && props.food.image === imgMenu) return imgMenu
-
-    const apiUrl = CLOUDINARY_UPLOAD_URL
-    const data = {
-      file: imgMenu,
-      upload_preset: CLOUDINARY_FOOD
-    }
-    try {
+console.log("imgMenu is: ", imgMenu)
+    const base64Data = imgMenu.replace(/^data:image\/\w+;base64,/, '');
+    const apiUrl = CLOUDINARY_UPLOAD_URL;
+    // Create a FormData object
+    const formData = new FormData();
+    formData.append('file', `data:image/jpeg;base64,${base64Data}`);
+    formData.append('upload_preset', CLOUDINARY_FOOD);
+  
+  try {
       const result = await fetch(apiUrl, {
-        body: JSON.stringify(data),
-        headers: {
-          'content-type': 'application/json'
-        },
+        body: formData,
         method: 'POST'
-      })
-      const imageData = await result.json()
-      return imageData.secure_url
+      });
+      const imageData = await result.json();
+      console.log("image data in return: ", imageData);
+  
+      return imageData.secure_url;
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
   }
   const { t } = props

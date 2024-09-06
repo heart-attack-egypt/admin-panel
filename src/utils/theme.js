@@ -143,9 +143,9 @@ const theme = createTheme({
       white: '#fff'
     },
     primary: {
-      main: '#6FCF97',
-      main2: '#90EA93',
-      main3: '#3C8F7C',
+      main: '#f28821',
+      main2: '#f09d4c',
+      main3: '#b95115',
       light: '#fff',
       dark: '#000',
       contrastText: '#fff'
@@ -153,13 +153,13 @@ const theme = createTheme({
     secondary: {
       main: '#FAFAFA',
       light: '#333333',
-      lightest: '#3C8F7C',
+      lightest: '#b95115',
       dark: '#949393',
       darkest: '#3EC6DD',
       contrastText: '#fff'
     },
     success: {
-      main: '#1DB20D',
+      main: '#ca9009',
       light: '#CDCDCD',
       lightest: '#EEF4FA',
       dark: '#FDEFDD',
@@ -184,8 +184,8 @@ const theme = createTheme({
       main: '#FA7751',
       light: '#FCC54C',
       lightest: 'rgba(240, 173, 78,0.2)',
-      dark: '#90EA93',
-      darkest: 'rgba(111, 207, 151, 0.34)',
+      dark: '#f28821',
+      darkest: '#FA7751',
       contrastText: '#fff'
     },
     grey: {

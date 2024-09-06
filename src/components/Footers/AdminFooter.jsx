@@ -30,7 +30,7 @@ function AdminFooter(props) {
         onChange={(event, newValue) => {
           setValue(newValue)
         }}>
-        <Typography className={classes.text}>©2022</Typography>
+        <Typography className={classes.text}>©2024</Typography>
 
         <Link
           className={classes.link}
@@ -41,18 +41,12 @@ function AdminFooter(props) {
         </Link>
         <Link
           className={classes.link}
-          href="https://ninjascode.com/about-us/"
+          href="https://www.facebook.com/HeartAttackEg/"
           target="_blank"
           underline="none">
           {t('About Us')}
         </Link>
-        <Link
-          className={classes.link}
-          href="https://enatega.com/blog/"
-          target="_blank"
-          underline="none">
-          {t('Blog')}
-        </Link>
+
       </BottomNavigation>
     </Box>
   )

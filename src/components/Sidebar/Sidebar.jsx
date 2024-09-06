@@ -44,7 +44,7 @@ function Sidebar(props) {
         <Typography
           variant="h2"
           className={[classes.headingText, classes.logoText]}>
-          ENATEGA
+          Heart Attack
         </Typography>
       </Toolbar>
       {restaurantName && restaurantImage ? (

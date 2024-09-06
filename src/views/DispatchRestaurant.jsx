@@ -24,6 +24,23 @@ const GET_ACTIVE_ORDERS = gql`
   ${getActiveOrders}
 `
 
+// New component to handle useSubscription
+const SubscriptionOrder = ({ row }) => {
+  const { data: dataSubscription } = useSubscription(SUBSCRIPTION_ORDER, {
+    variables: { id: row._id }
+  })
+
+  console.log(dataSubscription)
+
+  return (
+    <div style={{ overflow: 'visible', whiteSpace: 'pre' }}>
+      {row.orderId}
+      <br />
+      {transformToNewline(row.deliveryAddress.deliveryAddress, 3)}
+    </div>
+  )
+}
+
 const DispatchRestaurant = props => {
   const theme = useTheme()
   const { t } = props
@@ -81,59 +98,47 @@ const DispatchRestaurant = props => {
           {['PENDING', 'ACCEPTED', 'PICKED', 'ASSIGNED'].includes(
             row.orderStatus
           ) && (
-            <MenuItem
-              style={{ color: 'black' }}
-              onClick={() => {
-                mutateUpdate({
-                  variables: {
-                    id: row._id,
-                    orderStatus: 'CANCELLED'
-                  }
-                })
-              }}>
-              {t('Reject')}
-            </MenuItem>
-          )}
+              <MenuItem
+                style={{ color: 'black' }}
+                onClick={() => {
+                  mutateUpdate({
+                    variables: {
+                      id: row._id,
+                      orderStatus: 'CANCELLED'
+                    }
+                  })
+                }}>
+                {t('Reject')}
+              </MenuItem>
+            )}
           {['PENDING', 'ACCEPTED', 'PICKED', 'ASSIGNED'].includes(
             row.orderStatus
           ) && (
-            <MenuItem
-              style={{ color: 'black' }}
-              onClick={() => {
-                mutateUpdate({
-                  variables: {
-                    id: row._id,
-                    orderStatus: 'DELIVERED'
-                  }
-                })
-              }}>
-              {t('Delivered')}
-            </MenuItem>
-          )}
+              <MenuItem
+                style={{ color: 'black' }}
+                onClick={() => {
+                  mutateUpdate({
+                    variables: {
+                      id: row._id,
+                      orderStatus: 'DELIVERED'
+                    }
+                  })
+                }}>
+                {t('Delivered')}
+              </MenuItem>
+            )}
         </Select>
       </>
     )
   }
 
-  const subscribeFunc = row => {
-    const { data: dataSubscription } = useSubscription(SUBSCRIPTION_ORDER, {
-      variables: { id: row._id }
-    })
-    console.log(dataSubscription)
-    return (
-      <div style={{ overflow: 'visible', whiteSpace: 'pre' }}>
-        {row.orderId}
-        <br />
-        {transformToNewline(row.deliveryAddress.deliveryAddress, 3)}
-      </div>
-    )
-  }
+  // Modified to use the new SubscriptionOrder component
   const columns = [
     {
       name: t('OrderInformation'),
       sortable: true,
       selector: 'orderId',
-      cell: row => subscribeFunc(row)
+      cell: row => <SubscriptionOrder row={row} /> // Changed from subscribeFunc to SubscriptionOrder component
     },
     {
       name: t('RestaurantCol'),
@@ -178,20 +183,20 @@ const DispatchRestaurant = props => {
     searchQuery.length < 3
       ? dataOrders && dataOrders.getActiveOrders
       : dataOrders &&
-        dataOrders.getActiveOrders.filter(order => {
-          return (
-            order.restaurant.name.toLowerCase().search(regex) > -1 ||
-            order.orderId.toLowerCase().search(regex) > -1 ||
-            order.deliveryAddress.deliveryAddress.toLowerCase().search(regex) >
-              -1 ||
-            order.orderId.toLowerCase().search(regex) > -1 ||
-            order.paymentMethod.toLowerCase().search(regex) > -1 ||
-            order.orderStatus.toLowerCase().search(regex) > -1 ||
-            (order.rider !== null
-              ? order.rider.name.toLowerCase().search(regex) > -1
-              : false)
-          )
-        })
+      dataOrders.getActiveOrders.filter(order => {
+        return (
+          order.restaurant.name.toLowerCase().search(regex) > -1 ||
+          order.orderId.toLowerCase().search(regex) > -1 ||
+          order.deliveryAddress.deliveryAddress.toLowerCase().search(regex) >
+          -1 ||
+          order.orderId.toLowerCase().search(regex) > -1 ||
+          order.paymentMethod.toLowerCase().search(regex) > -1 ||
+          order.orderStatus.toLowerCase().search(regex) > -1 ||
+          (order.rider !== null
+            ? order.rider.name.toLowerCase().search(regex) > -1
+            : false)
+        )
+      })
 
   return (
     <>

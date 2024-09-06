@@ -38,7 +38,7 @@ const DELETE_OPTION = gql`
 
 const Option = props => {
   const { t } = props
-  const {PAID_VERSION} = ConfigurableValues()
+  const { PAID_VERSION } = ConfigurableValues()
   const [editModal, setEditModal] = useState(false)
   const [option, setOption] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -98,11 +98,11 @@ const Option = props => {
     },
     {
       name: t('Action'),
-      cell: row => <>{actionButtons(row)}</>
+      cell: row => <>{ActionButtons(row)}</>
     }
   ]
 
-  const actionButtons = row => {
+  const ActionButtons = row => {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
     const handleClick = event => {
@@ -133,15 +133,15 @@ const Option = props => {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                 
-                  if(PAID_VERSION)
-                  toggleModal(row)
-                else{
-                  setIsOpen(true)
-                  setTimeout(() => {
-                    setIsOpen(false)
-                  }, 5000)
-                }
+
+                  if (PAID_VERSION)
+                    toggleModal(row)
+                  else {
+                    setIsOpen(true)
+                    setTimeout(() => {
+                      setIsOpen(false)
+                    }, 5000)
+                  }
                 }}
                 style={{ height: 25 }}>
                 <ListItemIcon>
@@ -152,12 +152,12 @@ const Option = props => {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                 
-                  if(PAID_VERSION)
-                  mutate({
-                    variables: { id: row._id, restaurant: restaurantId }
-                  })
-                  else{
+
+                  if (PAID_VERSION)
+                    mutate({
+                      variables: { id: row._id, restaurant: restaurantId }
+                    })
+                  else {
                     setIsOpen(true)
                     setTimeout(() => {
                       setIsOpen(false)
@@ -184,12 +184,12 @@ const Option = props => {
     searchQuery.length < 3
       ? data && data.restaurant.options
       : data &&
-        data.restaurant.options.filter(option => {
-          return (
-            option.title.toLowerCase().search(regex) > -1 ||
-            option.description.toLowerCase().search(regex) > -1
-          )
-        })
+      data.restaurant.options.filter(option => {
+        return (
+          option.title.toLowerCase().search(regex) > -1 ||
+          option.description.toLowerCase().search(regex) > -1
+        )
+      })
   const globalClasses = useGlobalStyles()
   return (
     <>

@@ -188,33 +188,65 @@ function Banner(props) {
     setData((prev)=>({...prev, [name]: value}))
   }
 
+  // const uploadImageToCloudinary = async() => {
+  //   if (file === '') return file
+  //   if (props.banner && props.banner.file === file) return file
+
+  //   setFileLoading(true)
+  //   const apiUrl = CLOUDINARY_UPLOAD_URL
+  //   const data = {
+  //     file: file,
+  //     upload_preset: CLOUDINARY_FOOD
+  //   }
+  //   try {
+  //     const result = await fetch(apiUrl, {
+  //       body: JSON.stringify(data),
+  //       headers: {
+  //         'content-type': 'application/json'
+  //       },
+  //       method: 'POST'
+  //     })
+  //     const imageData = await result.json()
+  //     return imageData.secure_url
+  //   } catch (e) {
+  //     console.log('Image upload error => ', e)
+  //   } finally{
+  //     setFileLoading(false)
+  //   }
+  // }
   const uploadImageToCloudinary = async() => {
     if (file === '') return file
     if (props.banner && props.banner.file === file) return file
-
+console.log("banner file is: ", file)
     setFileLoading(true)
     const apiUrl = CLOUDINARY_UPLOAD_URL
-    const data = {
-      file: file,
-      upload_preset: CLOUDINARY_FOOD
-    }
+    const base64Data = file.replace(/^data:image\/\w+;base64,/, '');
+    // const data = {
+    //   file: file,
+    //   upload_preset: CLOUDINARY_FOOD
+    // }
+      // Create a FormData object
+      const formData = new FormData();
+      formData.append('file', `data:image/jpeg;base64,${base64Data}`);
+      formData.append('upload_preset', CLOUDINARY_FOOD);
+    
+      console.log("image data: ", formData);
+
     try {
-      const result = await fetch(apiUrl, {
-        body: JSON.stringify(data),
-        headers: {
-          'content-type': 'application/json'
-        },
+     const result = await fetch(apiUrl, {
+        body: formData,
         method: 'POST'
-      })
-      const imageData = await result.json()
-      return imageData.secure_url
+      });
+      const imageData = await result.json();
+      console.log("image data in return: ", imageData);
+  
+      return imageData.secure_url;
     } catch (e) {
       console.log('Image upload error => ', e)
     } finally{
       setFileLoading(false)
     }
   }
-
   const { t } = props
   const classes = useStyles()
   const globalClasses = useGlobalStyles()

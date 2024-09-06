@@ -50,11 +50,13 @@ const GET_AVAILABLE_RIDERS = gql`
 `
 
 function Riders(props) {
-  const {PAID_VERSION} = ConfigurableValues()
+  const { PAID_VERSION } = ConfigurableValues()
   const [editModal, setEditModal] = useState(false)
   const [rider, setRider] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  // const [anchorEl, setAnchorEl] = useState(null)
+  // const open = Boolean(anchorEl)
   const onChangeSearch = e => setSearchQuery(e.target.value)
   const [mutateToggle] = useMutation(TOGGLE_RIDER, {
     refetchQueries: [{ query: GET_RIDERS }, { query: GET_AVAILABLE_RIDERS }]
@@ -123,7 +125,7 @@ function Riders(props) {
     },
     {
       name: t('Action'),
-      cell: row => <>{actionButtons(row)}</>
+      cell: row => <>{ActionButtons(row)}</>
     }
   ]
 
@@ -143,7 +145,7 @@ function Riders(props) {
     )
   }
 
-  const actionButtons = row => {
+  const ActionButtons = row => {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
     const handleClick = event => {
@@ -174,15 +176,15 @@ function Riders(props) {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                  
-                  if(PAID_VERSION)
-                  toggleModal(row)
-                else{
-                  setIsOpen(true)
-                  setTimeout(() => {
-                    setIsOpen(false)
-                  }, 5000)
-                }
+
+                  if (PAID_VERSION)
+                    toggleModal(row)
+                  else {
+                    setIsOpen(true)
+                    setTimeout(() => {
+                      setIsOpen(false)
+                    }, 5000)
+                  }
                 }}
                 style={{ height: 25 }}>
                 <ListItemIcon>
@@ -193,15 +195,15 @@ function Riders(props) {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                  
-                  if(PAID_VERSION)
-                  mutateDelete({ variables: { id: row._id } })
-                else{
-                  setIsOpen(true)
-                  setTimeout(() => {
-                    setIsOpen(false)
-                  }, 5000)
-                }
+
+                  if (PAID_VERSION)
+                    mutateDelete({ variables: { id: row._id } })
+                  else {
+                    setIsOpen(true)
+                    setTimeout(() => {
+                      setIsOpen(false)
+                    }, 5000)
+                  }
                 }}
                 style={{ height: 25 }}>
                 <ListItemIcon>
@@ -221,14 +223,14 @@ function Riders(props) {
     searchQuery.length < 3
       ? data && data.riders
       : data &&
-        data.riders.filter(rider => {
-          return (
-            rider.name.toLowerCase().search(regex) > -1 ||
-            rider.username.toLowerCase().search(regex) > -1 ||
-            rider.phone.toLowerCase().search(regex) > -1 ||
-            rider.zone.title.toLowerCase().search(regex) > -1
-          )
-        })
+      data.riders.filter(rider => {
+        return (
+          rider.name.toLowerCase().search(regex) > -1 ||
+          rider.username.toLowerCase().search(regex) > -1 ||
+          rider.phone.toLowerCase().search(regex) > -1 ||
+          rider.zone.title.toLowerCase().search(regex) > -1
+        )
+      })
   const globalClasses = useGlobalStyles()
   return (
     <>

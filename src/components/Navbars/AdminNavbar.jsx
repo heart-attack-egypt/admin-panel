@@ -87,22 +87,27 @@ function AdminNavbar(props) {
                 aria-haspopup="true"
                 onClick={handleMenu}
                 color="inherit">
-                <img
-                  alt="..."
-                  src={require('../../assets/img/theme/team-4-800x800.jpg')}
-                  style={{
-                    height: 35,
-                    width: 35,
-                    borderRadius: '50%',
-                    marginLeft: -10
-                  }}
-                />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="black"
+                  className="size-6"
+                  style={{ height: '30px' }}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </svg>
               </IconButton>
               <Typography
                 mt={1}
                 sx={{ fontWeight: 'bold' }}
                 color="common.black">
-                Ninja
+                User
               </Typography>
             </Box>
             <Menu

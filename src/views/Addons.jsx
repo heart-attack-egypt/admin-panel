@@ -36,7 +36,7 @@ const DELETE_ADDON = gql`
 `
 const Addon = props => {
   const { t } = props
-  const {PAID_VERSION} = ConfigurableValues()
+  const { PAID_VERSION } = ConfigurableValues()
   const [addon, setAddon] = useState(null)
   const [editModal, setEditModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -95,11 +95,11 @@ const Addon = props => {
     },
     {
       name: t('Action'),
-      cell: row => <>{actionButtons(row)}</>
+      cell: row => <>{ActionButtons(row)}</>
     }
   ]
 
-  const actionButtons = row => {
+  const ActionButtons = row => {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
     const handleClick = event => {
@@ -130,14 +130,14 @@ const Addon = props => {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                  if(PAID_VERSION)
-                  toggleModal(row)
-                else{
-                  setIsOpen(true)
-                  setTimeout(() => {
-                    setIsOpen(false)
-                  }, 5000)
-                }
+                  if (PAID_VERSION)
+                    toggleModal(row)
+                  else {
+                    setIsOpen(true)
+                    setTimeout(() => {
+                      setIsOpen(false)
+                    }, 5000)
+                  }
                   console.log('PAID_VERSION', PAID_VERSION)
                 }}
                 style={{ height: 25 }}>
@@ -149,11 +149,11 @@ const Addon = props => {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                 
-                  if(PAID_VERSION)
-                  mutate({
-                    variables: { id: row._id, restaurant: restaurantId }
-                  })
+
+                  if (PAID_VERSION)
+                    mutate({
+                      variables: { id: row._id, restaurant: restaurantId }
+                    })
                   else {
                     setIsOpen(true)
                     setTimeout(() => {
@@ -180,12 +180,12 @@ const Addon = props => {
     searchQuery.length < 3
       ? data && data.restaurant.addons
       : data &&
-        data.restaurant.addons.filter(addon => {
-          return (
-            addon.title.toLowerCase().search(regex) > -1 ||
-            addon.description.toLowerCase().search(regex) > -1
-          )
-        })
+      data.restaurant.addons.filter(addon => {
+        return (
+          addon.title.toLowerCase().search(regex) > -1 ||
+          addon.description.toLowerCase().search(regex) > -1
+        )
+      })
   const globalClasses = useGlobalStyles()
 
   return (

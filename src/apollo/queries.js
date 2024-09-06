@@ -720,3 +720,31 @@ export const withdrawRequestQuery = `query GetWithdrawRequests($offset:Int){
           }
       }
   }`
+
+  export const toggleFoodStatus = `
+  mutation ToggleFoodStatus($restaurantId: ID!, $foodId: ID!, $isActive: Boolean!) {
+    toggleFoodStatus(restaurantId: $restaurantId, foodId: $foodId, isActive: $isActive) {
+      _id
+      categories {
+        _id
+        title
+        foods {
+          _id
+          title
+          description
+          variations {
+            _id
+            title
+            price
+            discounted
+            addons
+          }
+          image
+          isActive
+        }
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`

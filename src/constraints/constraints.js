@@ -221,7 +221,7 @@ const constraints = {
     },
     numericality: {
       greaterThan: 0,
-      lessThan: 100
+      lessThan: 10000
     }
   },
   tip: {

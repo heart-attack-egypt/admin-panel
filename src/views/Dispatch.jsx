@@ -22,79 +22,97 @@ import TableHeader from '../components/TableHeader'
 import { NotificationContainer, NotificationManager } from 'react-notifications'
 import 'react-notifications/lib/notifications.css'
 
-const SUBSCRIPTION_ORDER = gql`
-  ${subscriptionOrder}
-`
-const UPDATE_STATUS = gql`
-  ${updateStatus}
-`
-const ASSIGN_RIDER = gql`
-  ${assignRider}
-`
-const GET_RIDERS_BY_ZONE = gql`
-  ${getRidersByZone}
-`
-const GET_ACTIVE_ORDERS = gql`
-  ${getActiveOrders}
-`
+const SUBSCRIPTION_ORDER = gql`${subscriptionOrder}`
+const UPDATE_STATUS = gql`${updateStatus}`
+const ASSIGN_RIDER = gql`${assignRider}`
+const GET_RIDERS_BY_ZONE = gql`${getRidersByZone}`
+const GET_ACTIVE_ORDERS = gql`${getActiveOrders}`
 
-const Orders = props => {
+const RiderSelect = ({ row, globalClasses, mutateAssign }) => {
+  const { data: dataZone, loading, error } = useQuery(GET_RIDERS_BY_ZONE, {
+    variables: { id: row.zone._id }
+  });
+
+  if (loading) return <CustomLoader />;  // Show a loader while loading
+  if (error) return <p>Error loading riders</p>;  // Show an error message
+
+  // Use optional chaining and add a check before rendering the riders
+  return (
+    <Select
+      id="input-rider"
+      name="input-rider"
+      value=""
+      displayEmpty
+      inputProps={{ 'aria-label': 'Without label' }}
+      style={{ width: '50px' }}
+      className={globalClasses.selectInput}
+    >
+      {dataZone?.getRidersByZone?.length > 0 ? (
+        dataZone.getRidersByZone.map((rider) => (
+          <MenuItem
+            key={rider._id}
+            style={{ color: 'black' }}
+            onClick={() => {
+              mutateAssign({
+                variables: {
+                  id: row._id,
+                  riderId: rider._id
+                },
+                onCompleted: (data) => {
+                  console.log('Mutation success data:', data);
+                  NotificationManager.success('Successful', 'Rider updated!', 3000);
+                },
+                onError: (error) => {
+                  console.error('Mutation error:', error);
+                  NotificationManager.error('Error', 'Failed to update rider!', 3000);
+                }
+              });
+            }}
+          >
+            {rider.name}
+          </MenuItem>
+        ))
+      ) : (
+        <MenuItem disabled>No riders available</MenuItem>
+      )}
+    </Select>
+  );
+};
+
+
+const SubscriptionOrder = ({ row }) => {
+  const { data: dataSubscription, error } = useSubscription(SUBSCRIPTION_ORDER, {
+    variables: { id: row._id }
+  });
+
+  if (error) {
+    console.error("Subscription error:", error);
+  }
+
+  if (!dataSubscription) {
+    return <div>Loading...</div>;  // Show a loading indicator or a fallback
+  }
+
+  console.log(dataSubscription);
+
+  return (
+    <div style={{ overflow: 'visible', whiteSpace: 'pre' }}>
+      {row.orderId}
+      <br />
+      {transformToNewline(row.deliveryAddress.deliveryAddress, 3)}
+    </div>
+  );
+};
+
+const Orders = (props) => {
   const theme = useTheme()
   const { t } = props
   const [searchQuery, setSearchQuery] = useState('')
-  const onChangeSearch = e => setSearchQuery(e.target.value)
+  const onChangeSearch = (e) => setSearchQuery(e.target.value)
   const [mutateUpdate] = useMutation(UPDATE_STATUS)
   const globalClasses = useGlobalStyles()
   const [mutateAssign] = useMutation(ASSIGN_RIDER)
 
-  const riderFunc = row => {
-    const { data: dataZone } = useQuery(GET_RIDERS_BY_ZONE, {
-      variables: { id: row.zone._id }
-    })
-    return (
-      <Select
-        id="input-rider"
-        name="input-rider"
-        value=""
-        displayEmpty
-        inputProps={{ 'aria-label': 'Without label' }}
-        style={{ width: '50px' }}
-        className={globalClasses.selectInput}>
-        {dataZone &&
-          dataZone.ridersByZone.map(rider => (
-            <MenuItem
-              style={{ color: 'black' }}
-              onClick={() => {
-                mutateAssign({
-                  variables: {
-                    id: row._id,
-                    riderId: rider._id
-                  },
-                  onCompleted: data => {
-                    console.error('Mutation success data:', data)
-                    NotificationManager.success(
-                      'Successful',
-                      'Rider updated!',
-                      3000
-                    )
-                  },
-                  onError: error => {
-                    console.error('Mutation error:', error)
-                    NotificationManager.error(
-                      'Error',
-                      'Failed to update rider!',
-                      3000
-                    )
-                  }
-                })
-              }}
-              key={rider._id}>
-              {rider.name}
-            </MenuItem>
-          ))}
-      </Select>
-    )
-  }
   const {
     data: dataOrders,
     error: errorOrders,
@@ -102,8 +120,8 @@ const Orders = props => {
     refetch: refetchOrders
   } = useQuery(GET_ACTIVE_ORDERS, { pollInterval: 3000 })
 
-  const statusFunc = row => {
-    const handleStatusSuccessNotification = status => {
+  const statusFunc = (row) => {
+    const handleStatusSuccessNotification = (status) => {
       NotificationManager.success(status, 'Status Updated!', 3000)
     }
 
@@ -115,7 +133,8 @@ const Orders = props => {
           displayEmpty
           inputProps={{ 'aria-label': 'Without label' }}
           style={{ width: '50px' }}
-          className={globalClasses.selectInput}>
+          className={globalClasses.selectInput}
+        >
           {row.orderStatus === 'PENDING' && (
             <MenuItem
               style={{ color: 'black' }}
@@ -131,20 +150,15 @@ const Orders = props => {
                   },
                   onError: error => {
                     console.error('Mutation error:', error)
-                    NotificationManager.error(
-                      'Error',
-                      'Failed to update status!',
-                      3000
-                    )
+                    NotificationManager.error('Error', 'Failed to update status!', 3000)
                   }
                 })
-              }}>
+              }}
+            >
               {t('Accept')}
             </MenuItem>
           )}
-          {['PENDING', 'ACCEPTED', 'PICKED', 'ASSIGNED'].includes(
-            row.orderStatus
-          ) && (
+          {['PENDING', 'ACCEPTED', 'PICKED', 'ASSIGNED'].includes(row.orderStatus) && (
             <MenuItem
               style={{ color: 'black' }}
               onClick={() => {
@@ -159,20 +173,15 @@ const Orders = props => {
                   },
                   onError: error => {
                     console.error('Mutation error:', error)
-                    NotificationManager.error(
-                      'Error',
-                      'Failed to update status!',
-                      3000
-                    )
+                    NotificationManager.error('Error', 'Failed to update status!', 3000)
                   }
                 })
-              }}>
+              }}
+            >
               {t('Reject')}
             </MenuItem>
           )}
-          {['PENDING', 'ACCEPTED', 'PICKED', 'ASSIGNED'].includes(
-            row.orderStatus
-          ) && (
+          {['PENDING', 'ACCEPTED', 'PICKED', 'ASSIGNED'].includes(row.orderStatus) && (
             <MenuItem
               style={{ color: 'black' }}
               onClick={() => {
@@ -187,14 +196,11 @@ const Orders = props => {
                   },
                   onError: error => {
                     console.error('Mutation error:', error)
-                    NotificationManager.error(
-                      'Error',
-                      'Failed to update status!',
-                      3000
-                    )
+                    NotificationManager.error('Error', 'Failed to update status!', 3000)
                   }
                 })
-              }}>
+              }}
+            >
               {t('Delivered')}
             </MenuItem>
           )}
@@ -202,25 +208,13 @@ const Orders = props => {
       </>
     )
   }
-  const subscribeFunc = row => {
-    const { data: dataSubscription } = useSubscription(SUBSCRIPTION_ORDER, {
-      variables: { id: row._id }
-    })
-    console.log(dataSubscription)
-    return (
-      <div style={{ overflow: 'visible', whiteSpace: 'pre' }}>
-        {row.orderId}
-        <br />
-        {transformToNewline(row.deliveryAddress.deliveryAddress, 3)}
-      </div>
-    )
-  }
+
   const columns = [
     {
       name: t('OrderInformation'),
       sortable: true,
       selector: 'orderId',
-      cell: row => subscribeFunc(row)
+      cell: (row) => <SubscriptionOrder row={row} />
     },
     {
       name: t('RestaurantCol'),
@@ -233,31 +227,30 @@ const Orders = props => {
     {
       name: t('Status'),
       selector: 'orderStatus',
-      cell: row => (
+      cell: (row) => (
         <div style={{ overflow: 'visible' }}>
           {t(row.orderStatus)}
           <br />
-          {!['CANCELLED', 'DELIVERED'].includes(row.orderStatus) &&
-            statusFunc(row)}
+          {!['CANCELLED', 'DELIVERED'].includes(row.orderStatus) && statusFunc(row)}
         </div>
       )
     },
     {
       name: t('Rider'),
       selector: 'rider',
-      cell: row => (
+      cell: (row) => (
         <div style={{ overflow: 'visible' }}>
           {row.rider ? row.rider.name : ''}
           <br />
-          {!row.isPickedUp &&
-            !['CANCELLED', 'DELIVERED'].includes(row.orderStatus) &&
-            riderFunc(row)}
+          {!row.isPickedUp && !['CANCELLED', 'DELIVERED'].includes(row.orderStatus) && (
+            <RiderSelect row={row} globalClasses={globalClasses} mutateAssign={mutateAssign} />
+          )}
         </div>
       )
     },
     {
       name: t('OrderTime'),
-      cell: row => (
+      cell: (row) => (
         <>{new Date(row.createdAt).toLocaleString().replace(/ /g, '\n')}</>
       )
     }
@@ -265,7 +258,7 @@ const Orders = props => {
 
   const conditionalRowStyles = [
     {
-      when: row => ['DELIVERED', 'CANCELLED'].includes(row.orderStatus),
+      when: (row) => ['DELIVERED', 'CANCELLED'].includes(row.orderStatus),
       style: {
         backgroundColor: theme.palette.success.dark
       }
@@ -278,20 +271,19 @@ const Orders = props => {
     searchQuery.length < 3
       ? dataOrders && dataOrders.getActiveOrders
       : dataOrders &&
-        dataOrders.getActiveOrders.filter(order => {
-          return (
-            order.restaurant.name.toLowerCase().search(regex) > -1 ||
-            order.orderId.toLowerCase().search(regex) > -1 ||
-            order.deliveryAddress.deliveryAddress.toLowerCase().search(regex) >
-              -1 ||
-            order.orderId.toLowerCase().search(regex) > -1 ||
-            order.paymentMethod.toLowerCase().search(regex) > -1 ||
-            order.orderStatus.toLowerCase().search(regex) > -1 ||
-            (order.rider !== null
-              ? order.rider.name.toLowerCase().search(regex) > -1
-              : false)
-          )
-        })
+      dataOrders.getActiveOrders.filter((order) => {
+        return (
+          order.restaurant.name.toLowerCase().search(regex) > -1 ||
+          order.orderId.toLowerCase().search(regex) > -1 ||
+          order.deliveryAddress.deliveryAddress.toLowerCase().search(regex) > -1 ||
+          order.orderId.toLowerCase().search(regex) > -1 ||
+          order.paymentMethod.toLowerCase().search(regex) > -1 ||
+          order.orderStatus.toLowerCase().search(regex) > -1 ||
+          (order.rider !== null
+            ? order.rider.name.toLowerCase().search(regex) > -1
+            : false)
+        )
+      })
 
   return (
     <>

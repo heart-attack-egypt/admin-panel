@@ -45,7 +45,7 @@ const DELETE_SECTION = gql`
 
 function Sections(props) {
   const { t } = props
-  const {PAID_VERSION} = ConfigurableValues()
+  const { PAID_VERSION } = ConfigurableValues()
   const [editModal, setEditModal] = useState(false)
   const [sections, setSections] = useState(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -103,7 +103,7 @@ function Sections(props) {
     },
     {
       name: t('Action'),
-      cell: row => <>{actionButtons(row)}</>
+      cell: row => <>{ActionButtons(row)}</>
     }
   ]
 
@@ -133,7 +133,7 @@ function Sections(props) {
       </>
     )
   }
-  const actionButtons = row => {
+  const ActionButtons = row => {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
     const handleClick = event => {
@@ -164,15 +164,15 @@ function Sections(props) {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                 
-                  if(PAID_VERSION)
-                  toggleModal(row)
-                else{
-                  setIsOpen(true)
-                  setTimeout(() => {
-                    setIsOpen(false)
-                  }, 5000)
-                }
+
+                  if (PAID_VERSION)
+                    toggleModal(row)
+                  else {
+                    setIsOpen(true)
+                    setTimeout(() => {
+                      setIsOpen(false)
+                    }, 5000)
+                  }
                 }}
                 style={{ height: 25 }}>
                 <ListItemIcon>
@@ -183,15 +183,15 @@ function Sections(props) {
               <MenuItem
                 onClick={e => {
                   e.preventDefault()
-                 
-                  if(PAID_VERSION)
-                  mutateDelete({ variables: { id: row._id } })
-                else{
-                  setIsOpen(true)
-                  setTimeout(() => {
-                    setIsOpen(false)
-                  }, 5000)
-                }
+
+                  if (PAID_VERSION)
+                    mutateDelete({ variables: { id: row._id } })
+                  else {
+                    setIsOpen(true)
+                    setTimeout(() => {
+                      setIsOpen(false)
+                    }, 5000)
+                  }
                 }}
                 style={{ height: 25 }}>
                 <ListItemIcon>
@@ -214,9 +214,9 @@ function Sections(props) {
     searchQuery.length < 3
       ? data && data.sections
       : data &&
-        data.sections.filter(section => {
-          return section.name.toLowerCase().search(regex) > -1
-        })
+      data.sections.filter(section => {
+        return section.name.toLowerCase().search(regex) > -1
+      })
 
   const globalClasses = useGlobalStyles()
 
@@ -254,7 +254,7 @@ function Sections(props) {
               <SearchBar
                 value={searchQuery}
                 onChange={onChangeSearch}
-                // onClick={() => refetch()}
+              // onClick={() => refetch()}
               />
             }
             columns={columns}

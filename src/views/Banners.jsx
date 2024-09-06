@@ -105,7 +105,7 @@ const Banners = props => {
     },
     {
       name: t('Action'),
-      cell: row => <>{actionButtons(row)}</>
+      cell: row => <>{ActionButtons(row)}</>
     }
   ]
   const regex =
@@ -114,11 +114,11 @@ const Banners = props => {
     searchQuery.length < 3
       ? data && data.banners
       : data &&
-        data.banners.filter(banner => {
-          return banner.title.toLowerCase().search(regex) > -1
-        })
+      data.banners.filter(banner => {
+        return banner.title.toLowerCase().search(regex) > -1
+      })
 
-  const actionButtons = row => {
+  const ActionButtons = row => {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
     const handleClick = event => {

@@ -31,8 +31,8 @@ const Restaurants = props => {
   const globalClasses = useGlobalStyles()
 
   const [mutate, { loading }] = useMutation(DELETE_RESTAURANT, {
-    onError: (error)=> {
-      setError(error.graphQLErrors[0].message || 'Something went wrong') 
+    onError: (error) => {
+      setError(error.graphQLErrors[0].message || 'Something went wrong')
     }
   })
   const {
@@ -113,11 +113,11 @@ const Restaurants = props => {
     },
     {
       name: t('Action'),
-      cell: row => <>{actionButtons(row)}</>
+      cell: row => <>{ActionButtons(row)}</>
     }
   ]
   const theme = useTheme()
-  const actionButtons = row => {
+  const ActionButtons = row => {
     return (
       <>
         {loading ? (
@@ -153,24 +153,24 @@ const Restaurants = props => {
     }
   ]
 
-  const regex = useMemo(()=>(
+  const regex = useMemo(() => (
     searchQuery.length > 2 ? new RegExp(searchQuery.toLowerCase(), 'g') : null
-  ),[searchQuery])
+  ), [searchQuery])
 
-  const filtered = useMemo(()=>(
+  const filtered = useMemo(() => (
     searchQuery.length < 3
       ? data && data.restaurants
       : data &&
-        data.restaurants.filter(restaurant => {
-          return (
-            (restaurant.name && restaurant.name.toLowerCase().search(regex) > -1) ||
-            (restaurant.orderPrefix && restaurant.orderPrefix.toLowerCase().search(regex) > -1) ||
-            (restaurant.owner && restaurant.owner.email.toLowerCase().search(regex) > -1) ||
-            (restaurant.address && restaurant.address.toLowerCase().search(regex) > -1)
-          )
-        })
+      data.restaurants.filter(restaurant => {
+        return (
+          (restaurant.name && restaurant.name.toLowerCase().search(regex) > -1) ||
+          (restaurant.orderPrefix && restaurant.orderPrefix.toLowerCase().search(regex) > -1) ||
+          (restaurant.owner && restaurant.owner.email.toLowerCase().search(regex) > -1) ||
+          (restaurant.address && restaurant.address.toLowerCase().search(regex) > -1)
+        )
+      })
   ), [searchQuery, data, regex])
-    
+
   return (
     <>
       <Header />
@@ -212,7 +212,7 @@ const Restaurants = props => {
         <Snackbar
           open={error}
           autoHideDuration={5000}
-          onClose={()=>setError(null)}
+          onClose={() => setError(null)}
           message={error}
         />
       </Container>

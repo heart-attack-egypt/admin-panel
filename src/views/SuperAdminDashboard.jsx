@@ -213,9 +213,12 @@ const SuperAdminDashboard = props => {
             </BoxCard>
             <BoxCard>
               <Typography sx={headSty}>{t('TotalRestaurants')}</Typography>
-              <Typography sx={sty}>
+              {/* <Typography sx={sty}>
                 {loadingRest ? '...' : restaurants.restaurants.length}
-              </Typography>
+              </Typography> */}
+              <Typography sx={sty}>
+  {loadingRest ? '...' : (restaurants && restaurants.restaurants ? restaurants.restaurants.length : 0)}
+</Typography>
               <img
                 src={RestStat}
                 alt="stat"

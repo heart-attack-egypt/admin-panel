@@ -1,0 +1,31 @@
+# Ignore node_modules except the 'prod' ones
+node_modules
+!node_modules/.prisma
+dist
+coverage
+.vscode
+.idea
+.DS_Store
+*.log
+*.ts
+*.spec.ts
+docker-compose*.yml
+Dockerfile*
+# Ignore test and build artifacts
+test
+docs
+src/**/*.spec.ts
+src/**/*.test.ts
+src/**/*.e2e-spec.ts
+src/**/*.e2e-test.ts
+
+# Ignore git files
+.git
+.gitignore
+
+# Ignore local environment variables
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.stage.local

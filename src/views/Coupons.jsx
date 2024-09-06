@@ -43,6 +43,8 @@ const Coupon = props => {
   const [editModal, setEditModal] = useState(false)
   const [coupon, setCoupon] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  // const [anchorEl, setAnchorEl] = useState(null)
+  // const open = Boolean(anchorEl)
   const onChangeSearch = e => setSearchQuery(e.target.value)
   const [mutateEdit] = useMutation(EDIT_COUPON)
   const [mutateDelete] = useMutation(DELETE_COUPON, {
@@ -85,7 +87,7 @@ const Coupon = props => {
     },
     {
       name: t('Action'),
-      cell: row => <>{actionButtons(row)}</>
+      cell: row => <>{ActionButtons(row)}</>
     }
   ]
   const regex =
@@ -94,9 +96,9 @@ const Coupon = props => {
     searchQuery.length < 3
       ? data && data.coupons
       : data &&
-        data.coupons.filter(coupon => {
-          return coupon.title.toLowerCase().search(regex) > -1
-        })
+      data.coupons.filter(coupon => {
+        return coupon.title.toLowerCase().search(regex) > -1
+      })
 
   const statusChanged = row => {
     return (
@@ -122,7 +124,7 @@ const Coupon = props => {
       </>
     )
   }
-  const actionButtons = row => {
+  const ActionButtons = row => {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
     const handleClick = event => {
