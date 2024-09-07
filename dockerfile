@@ -13,10 +13,10 @@ RUN npm install
 COPY . .
 
 # Build the application
-RUN npm run build --force
+RUN npm run build 
 
 # Stage 2: Serve the application from Nginx
-FROM nginx
+FROM nginx:alpine
 
 # Remove default Nginx website
 RUN rm -rf /usr/share/nginx/html/*
