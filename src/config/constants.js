@@ -7,9 +7,10 @@ const ConfigurableValues = () => {
   // const WS_SERVER_URL = 'wss://enatega-multivendor.up.railway.app'
   // const SERVER_URL = 'http://192.168.0.107:8001'
   // const WS_SERVER_URL = 'ws://192.168.0.107:8001'
-  const GRAPHQL_URL='https://heartattack.ws/graphql'
-  const SERVER_URL = 'https://heartattack.ws'
-  const WS_SERVER_URL = 'wss://heartattack.ws/graphql'
+  //.envvvvvv
+  const GRAPHQL_URL='https://api-heart-attack-prod-277226964694.europe-west3.run.app/graphql'
+  const SERVER_URL = 'https://admin.heartattack.shop'
+  const WS_SERVER_URL = 'wss://api-heart-attack-prod-277226964694.europe-west3.run.app/graphql'
   const GOOGLE_MAPS_KEY = 'AIzaSyCrSZxTEqjc5qnyg4EghQVJz2I6KuEcuwg'
   const FIREBASE_KEY = configuration.firebaseKey
   const APP_ID = configuration.appId
