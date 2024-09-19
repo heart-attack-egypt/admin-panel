@@ -7,9 +7,9 @@ const ConfigurableValues = () => {
   // const WS_SERVER_URL = 'wss://enatega-multivendor.up.railway.app'
   // const SERVER_URL = 'http://192.168.0.107:8001'
   // const WS_SERVER_URL = 'ws://192.168.0.107:8001'
-  const GRAPHQL_URL='https://dev-api-gateway.heartattack.shop/graphql'
+  const GRAPHQL_URL='https://dev-api-gateway.heartattack.shop'
   const SERVER_URL = 'https://dev-api-gateway.heartattack.shop'
-  const WS_SERVER_URL = 'wss://dev-api-gateway.heartattack.shop/graphql'
+  const WS_SERVER_URL = 'wss://dev-api-gateway.heartattack.shop'
   const GOOGLE_MAPS_KEY = 'AIzaSyCrSZxTEqjc5qnyg4EghQVJz2I6KuEcuwg'
   const FIREBASE_KEY = configuration.firebaseKey
   const APP_ID = configuration.appId
