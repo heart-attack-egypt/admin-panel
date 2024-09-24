@@ -1,165 +1,173 @@
 /* eslint-disable react/display-name */
-import React, { useEffect, useState } from 'react'
-import { withTranslation } from 'react-i18next'
-import { transformToNewline } from '../../utils/stringManipulations'
-import DataTable from 'react-data-table-component'
-import orderBy from 'lodash/orderBy'
-import CustomLoader from '../Loader/CustomLoader'
-import { subscribePlaceOrder, orderCount } from '../../apollo'
-import { useQuery, gql } from '@apollo/client'
-import SearchBar from '../TableHeader/SearchBar'
-import { customStyles } from '../../utils/tableCustomStyles'
-import TableHeader from '../TableHeader'
-import { useTheme } from '@mui/material'
+import React, { useEffect, useState } from "react";
+import { withTranslation } from "react-i18next";
+import { transformToNewline } from "../../utils/stringManipulations";
+import DataTable from "react-data-table-component";
+import orderBy from "lodash/orderBy";
+import CustomLoader from "../Loader/CustomLoader";
+import { subscribePlaceOrder, orderCount } from "../../apollo";
+import { useQuery, gql } from "@apollo/client";
+import SearchBar from "../TableHeader/SearchBar";
+import { customStyles } from "../../utils/tableCustomStyles";
+import TableHeader from "../TableHeader";
+import { useTheme } from "@mui/material";
 
 const ORDERCOUNT = gql`
   ${orderCount}
-`
+`;
 const ORDER_PLACED = gql`
   ${subscribePlaceOrder}
-`
+`;
 
-const OrdersData = props => {
-  const theme = useTheme()
-  const { t } = props
-  const { selected, updateSelected } = props
-  const [searchQuery, setSearchQuery] = useState('')
-  const onChangeSearch = e => setSearchQuery(e.target.value)
-  const getItems = items => {
+const OrdersData = (props) => {
+  const theme = useTheme();
+  const { t } = props;
+  const { selected, updateSelected } = props;
+  const [searchQuery, setSearchQuery] = useState("");
+  const onChangeSearch = (e) => setSearchQuery(e.target.value);
+  const getItems = (items) => {
     return items
       .map(
-        item =>
+        (item) =>
           `${item.quantity}x${item.title}${
-            item.variation.title ? `(${item.variation.title})` : ''
+            item.variation.title ? `(${item.variation.title})` : ""
           }`
       )
-      .join('\n')
-  }
-  const restaurantId = localStorage.getItem('restaurantId')
+      .join("\n");
+  };
+  const restaurantId = localStorage.getItem("restaurantId");
 
   const { data, loading: loadingQuery } = useQuery(ORDERCOUNT, {
-    variables: { restaurant: restaurantId }
-  })
+    variables: { restaurant: restaurantId },
+  });
 
   const propExists = (obj, path) => {
-    return path.split('.').reduce((obj, prop) => {
-      return obj && obj[prop] ? obj[prop] : ''
-    }, obj)
-  }
+    return path.split(".").reduce((obj, prop) => {
+      return obj && obj[prop] ? obj[prop] : "";
+    }, obj);
+  };
 
   const customSort = (rows, field, direction) => {
-    const handleField = row => {
+    const handleField = (row) => {
       if (field && isNaN(propExists(row, field))) {
-        return propExists(row, field).toLowerCase()
+        return propExists(row, field).toLowerCase();
       }
 
-      return row[field]
-    }
+      return row[field];
+    };
 
-    return orderBy(rows, handleField, direction)
-  }
+    return orderBy(rows, handleField, direction);
+  };
 
   const handlePerRowsChange = (perPage, page) => {
-    props.page(page)
-    props.rows(perPage)
-  }
+    props.page(page);
+    props.rows(perPage);
+  };
 
-  const handlePageChange = async page => {
-    props.page(page)
-  }
+  const handlePageChange = async (page) => {
+    props.page(page);
+  };
 
   const columns = [
     {
-      name: t('OrderID'),
+      name: t("OrderID"),
       sortable: true,
-      selector: 'orderId'
+      selector: "orderId",
     },
     {
-      name: t('Items'),
-      cell: row => <>{getItems(row.items)}</>
+      name: t("Items"),
+      cell: (row) => <>{getItems(row.items)}</>,
     },
     {
-      name: t('Payment'),
-      selector: 'paymentMethod',
-      sortable: true
+      name: t("Payment"),
+      selector: "paymentMethod",
+      sortable: true,
     },
     {
-      name: t('Status'),
-      selector: 'orderStatus',
-      sortable: true
+      name: t("Status"),
+      selector: "orderStatus",
+      sortable: true,
     },
     {
-      name: t('Datetime'),
-      cell: row => (
-        <>{new Date(row.createdAt).toLocaleString().replace(/ /g, '\n')}</>
-      )
+      name: t("Datetime"),
+      cell: (row) => (
+        <>{new Date(row.createdAt).toLocaleString().replace(/ /g, "\n")}</>
+      ),
     },
     {
-      name: t('Address'),
-      cell: row => (
+      name: t("Address"),
+      cell: (row) => (
         <>{transformToNewline(row.deliveryAddress.deliveryAddress, 3)}</>
-      )
-    }
-  ]
+      ),
+    },
+    {
+      name: t("name"),
+      cell: (row) => <>{transformToNewline(row.user?.name ?? "", 3)}</>,
+    },
+    {
+      name: t("phone"),
+      cell: (row) => <>{transformToNewline(row.user?.phone ?? "", 3)}</>,
+    },
+  ];
 
   const conditionalRowStyles = [
     {
-      when: row =>
-        row.orderStatus !== 'DELIVERED' && row.orderStatus !== 'CANCELLED',
+      when: (row) =>
+        row.orderStatus !== "DELIVERED" && row.orderStatus !== "CANCELLED",
       style: {
-        backgroundColor: theme.palette.warning.lightest
-      }
-    }
-  ]
+        backgroundColor: theme.palette.warning.lightest,
+      },
+    },
+  ];
   useEffect(() => {
     props.subscribeToMore({
       document: ORDER_PLACED,
       variables: { id: restaurantId },
       updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev
-        if (subscriptionData.data.subscribePlaceOrder.origin === 'new') {
+        if (!subscriptionData.data) return prev;
+        if (subscriptionData.data.subscribePlaceOrder.origin === "new") {
           return {
             ordersByRestId: [
               subscriptionData.data.subscribePlaceOrder.order,
-              ...prev.ordersByRestId
-            ]
-          }
+              ...prev.ordersByRestId,
+            ],
+          };
         } else {
           const orderIndex = prev.ordersByRestId.findIndex(
-            o => subscriptionData.data.subscribePlaceOrder.order._id === o._id
-          )
+            (o) => subscriptionData.data.subscribePlaceOrder.order._id === o._id
+          );
           prev.ordersByRestId[orderIndex] =
-            subscriptionData.data.subscribePlaceOrder.order
-          return { ordersByRestId: [...prev.ordersByRestId] }
+            subscriptionData.data.subscribePlaceOrder.order;
+          return { ordersByRestId: [...prev.ordersByRestId] };
         }
       },
-      onError: error => {
-        console.log('onError', error)
-      }
-    })
-  }, [])
+      onError: (error) => {
+        console.log("onError", error);
+      },
+    });
+  }, []);
   useEffect(() => {
     if (selected) {
-      const order = props.orders.find(o => o._id === selected._id)
-      updateSelected(order)
+      const order = props.orders.find((o) => o._id === selected._id);
+      updateSelected(order);
     }
-  }, [props.orders])
+  }, [props.orders]);
 
   const regex =
-    searchQuery.length > 2 ? new RegExp(searchQuery.toLowerCase(), 'g') : null
+    searchQuery.length > 2 ? new RegExp(searchQuery.toLowerCase(), "g") : null;
 
   const filtered =
     searchQuery.length < 3
       ? props && props.orders
       : props.orders &&
-        props.orders.filter(order => {
-          return order.orderId.toLowerCase().search(regex) > -1
-        })
+        props.orders.filter((order) => {
+          return order.orderId.toLowerCase().search(regex) > -1;
+        });
 
   return (
     <>
       <DataTable
-        title={<TableHeader title={t('Orders')} />}
+        title={<TableHeader title={t("Orders")} />}
         columns={columns}
         data={filtered}
         onRowClicked={props.toggleModal}
@@ -183,6 +191,6 @@ const OrdersData = props => {
         paginationIconFirstPage=""
       />
     </>
-  )
-}
-export default withTranslation()(OrdersData)
+  );
+};
+export default withTranslation()(OrdersData);

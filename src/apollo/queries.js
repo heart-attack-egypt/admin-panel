@@ -1,26 +1,26 @@
 export const getOrders = `query Orders($page:Int){
     allOrders(page:$page){
       _id
-      deliveryAddress
-      deliveryCharges
-      orderAmount
-      paidAmount
-      paymentMethod
       orderId
-      user{
+      restaurant{
         _id
         name
-        email
-        phone
+        image
+        address
+        location{coordinates}
+      }
+      deliveryAddress{
+        location{coordinates}
+        deliveryAddress
+        details
+        label
       }
       items{
         _id
-        food{
-          _id
-          title
-          description
-          image
-        }
+        title
+        description
+        image
+        quantity
         variation{
           _id
           title
@@ -29,35 +29,48 @@ export const getOrders = `query Orders($page:Int){
         }
         addons{
           _id
-          title
-          description
-          quantityMinimum
-          quantityMaximum
           options{
             _id
             title
+            description
             price
           }
+          description
+          title
+          quantityMinimum
+          quantityMaximum
         }
         specialInstructions
-        quantity
+        isActive
+        createdAt
+        updatedAt
       }
-      reason
+      user{
+        _id
+        name
+        phone
+        email
+      }
+      paymentMethod
+      paidAmount
+      orderAmount
+      orderStatus
       status
       paymentStatus
-      orderStatus
+      reason
+      isActive
       createdAt
-      review{
-        _id
-        rating
-        description
-      }
+      deliveryCharges
+      tipping
+      taxationAmount
       rider{
         _id
         name
+        username
+        available
       }
     }
-  }`
+  }`;
 
 export const reviews = `query Reviews($restaurant:String!){
     reviews(restaurant:$restaurant){
@@ -84,7 +97,7 @@ export const reviews = `query Reviews($restaurant:String!){
       createdAt
     }
   }
-`
+`;
 
 export const getOrdersByDateRange = `query GetOrdersByDateRange($startingDate: String!, $endingDate: String!, $restaurant: String!) {
     getOrdersByDateRange(startingDate: $startingDate, endingDate: $endingDate, restaurant: $restaurant) {
@@ -93,7 +106,7 @@ export const getOrdersByDateRange = `query GetOrdersByDateRange($startingDate: S
     }
     
   }
-`
+`;
 
 export const getOrdersByRestaurant = `query ordersByRestId($restaurant:String!,$page:Int,$rows:Int,$search:String){
     ordersByRestId(restaurant:$restaurant,page:$page,rows:$rows,search:$search){
@@ -167,14 +180,14 @@ export const getOrdersByRestaurant = `query ordersByRestId($restaurant:String!,$
         available
       }
     }
-  }`
+  }`;
 
 export const getDashboardTotal = `query GetDashboardTotal($startingDate: String, $endingDate: String,$restaurant:String!){
     getDashboardTotal(starting_date: $startingDate, ending_date: $endingDate,restaurant:$restaurant){
       totalOrders
       totalSales
     }
-  }`
+  }`;
 export const getDashboardSales = `query GetDashboardSales($startingDate: String, $endingDate: String,$restaurant:String!){
     getDashboardSales(starting_date: $startingDate, ending_date: $endingDate,restaurant:$restaurant){
       orders{
@@ -182,7 +195,7 @@ export const getDashboardSales = `query GetDashboardSales($startingDate: String,
         amount
       }
     }
-  }`
+  }`;
 export const getDashboardOrders = `query GetDashboardOrders($startingDate: String, $endingDate: String,$restaurant:String!){
     getDashboardOrders(starting_date: $startingDate, ending_date: $endingDate,restaurant:$restaurant){
       orders{
@@ -190,7 +203,7 @@ export const getDashboardOrders = `query GetDashboardOrders($startingDate: Strin
         count
       }
     }
-  }`
+  }`;
 
 export const getDashboardData = `query GetDashboardData($startingDate: String, $endingDate: String){
     getDashboardData(starting_date: $startingDate, ending_date: $endingDate){
@@ -203,7 +216,7 @@ export const getDashboardData = `query GetDashboardData($startingDate: String, $
         amount
       }
     }
-  }`
+  }`;
 
 export const getConfiguration = `query GetConfiguration{
     configuration{
@@ -263,12 +276,12 @@ export const getConfiguration = `query GetConfiguration{
       skipMobileVerification
       costType
     }
-  }`
+  }`;
 
 export const orderCount = `
 query OrderCount($restaurant:String!){
   orderCount(restaurant:$restaurant)
-}`
+}`;
 
 export const getActiveOrders = `query GetActiveOrders($restaurantId:ID){
   getActiveOrders(restaurantId:$restaurantId){
@@ -344,7 +357,7 @@ export const getActiveOrders = `query GetActiveOrders($restaurantId:ID){
       available
     }
   }
-}`
+}`;
 
 export const getRidersByZone = `query RidersByZone($id:String!){
   ridersByZone(id:$id){
@@ -359,7 +372,7 @@ export const getRidersByZone = `query RidersByZone($id:String!){
       title
     }
   }
-}`
+}`;
 
 export const getZones = `query Zones{
     zones{
@@ -369,7 +382,7 @@ export const getZones = `query Zones{
     location{coordinates}
     isActive
     }
-}`
+}`;
 
 export const getVendors = `query Vendors{
     vendors{
@@ -392,7 +405,7 @@ export const getVendors = `query Vendors{
         shopType
       }
     }
-}`
+}`;
 
 export const getVendor = `query GetVendor($id:String!){
     getVendor(id:$id){
@@ -411,7 +424,7 @@ export const getVendor = `query GetVendor($id:String!){
           shopType
         }
     }
-}`
+}`;
 
 export const getTaxation = `query Taxes{
     taxes {
@@ -419,7 +432,7 @@ export const getTaxation = `query Taxes{
       taxationCharges
       enabled
       }
-    }`
+    }`;
 
 export const getCoupons = `query Coupons{
     coupons {
@@ -428,9 +441,9 @@ export const getCoupons = `query Coupons{
       discount
       enabled
     }
-  }`
+  }`;
 
-  export const getCuisines = `query Cuisines{
+export const getCuisines = `query Cuisines{
     cuisines {
       _id
       name
@@ -438,9 +451,9 @@ export const getCoupons = `query Coupons{
       image
       shopType
     }
-  }`
+  }`;
 
-  export const getBanners = `query Banners{
+export const getBanners = `query Banners{
     banners {
       _id
       title
@@ -450,10 +463,10 @@ export const getCoupons = `query Coupons{
       file
       parameters
     }
-  }`
-  export const getBannerActions = `query BannerActions{
+  }`;
+export const getBannerActions = `query BannerActions{
     bannerActions
-  }`
+  }`;
 
 export const getTipping = `query Tips{
     tips {
@@ -461,7 +474,7 @@ export const getTipping = `query Tips{
       tipVariations
       enabled
     }
-  }`
+  }`;
 
 export const getAddons = `query Addons{
     addons{
@@ -476,7 +489,7 @@ export const getAddons = `query Addons{
     }
     quantityMinimum
     quantityMaximum
-  }}`
+  }}`;
 
 export const getOptions = `query Options{
     options {
@@ -486,10 +499,10 @@ export const getOptions = `query Options{
       price
     }
   }
-  `
+  `;
 export const getPaymentStatuses = `query{
     getPaymentStatuses
-  }`
+  }`;
 
 export const restaurantByOwner = `query RestaurantByOwner($id:String){
   restaurantByOwner(id:$id){
@@ -510,7 +523,7 @@ export const restaurantByOwner = `query RestaurantByOwner($id:String){
     shopType
     }
   }
-}`
+}`;
 
 export const restaurantList = `query RestaurantList{
   restaurantList{
@@ -518,7 +531,7 @@ export const restaurantList = `query RestaurantList{
     name
     address
   }
-}`
+}`;
 
 export const restaurants = `query Restaurants{
   restaurants{
@@ -540,7 +553,7 @@ export const restaurants = `query Restaurants{
     shopType
   }
 }
-`
+`;
 
 export const getRestaurantProfile = `query Restaurant($id:String){
       restaurant(id:$id)
@@ -578,7 +591,7 @@ export const getRestaurantProfile = `query Restaurant($id:String){
       shopType
       cuisines
     }
-}`
+}`;
 
 export const getRestaurantDetail = `query Restaurant($id:String){
       restaurant(id:$id){
@@ -627,7 +640,7 @@ export const getRestaurantDetail = `query Restaurant($id:String){
       }
       shopType
     }
-}`
+}`;
 
 export const getOffers = `query Offers{
   offers{
@@ -639,7 +652,7 @@ export const getOffers = `query Offers{
       name
     }
   }
-}`
+}`;
 
 export const getSections = `query Sections{
   sections{
@@ -651,13 +664,13 @@ export const getSections = `query Sections{
       name
     }
   }
-}`
+}`;
 
 export const pageCount = `
 query PageCount($restaurant:String!){
   pageCount(restaurant:$restaurant)
 }
-`
+`;
 export const getUsers = `query{
     users{
       _id
@@ -669,7 +682,7 @@ export const getUsers = `query{
         deliveryAddress
       }
     }
-  }`
+  }`;
 
 export const getRiders = `query{
     riders{
@@ -684,7 +697,7 @@ export const getRiders = `query{
         title
       }
     }
-  }`
+  }`;
 
 export const getAvailableRiders = `query{
     availableRiders{
@@ -697,7 +710,7 @@ export const getAvailableRiders = `query{
         _id
       }
     }
-  }`
+  }`;
 
 export const withdrawRequestQuery = `query GetWithdrawRequests($offset:Int){
       getAllWithdrawRequests(offset:$offset){
@@ -719,9 +732,9 @@ export const withdrawRequestQuery = `query GetWithdrawRequests($offset:Int){
             total
           }
       }
-  }`
+  }`;
 
-  export const toggleFoodStatus = `
+export const toggleFoodStatus = `
   mutation ToggleFoodStatus($restaurantId: ID!, $foodId: ID!, $isActive: Boolean!) {
     toggleFoodStatus(restaurantId: $restaurantId, foodId: $foodId, isActive: $isActive) {
       _id
@@ -747,4 +760,4 @@ export const withdrawRequestQuery = `query GetWithdrawRequests($offset:Int){
       }
     }
   }
-`
+`;
