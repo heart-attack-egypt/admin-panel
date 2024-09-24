@@ -55,6 +55,7 @@ import { ReactComponent as RestaurantSectionIcon } from "./assets/svg/restSectio
 import SuperAdminDashboard from "./views/SuperAdminDashboard";
 import Cuisines from "./views/Cuisines";
 import Banners from "./views/Banners";
+import AllOrders from "./views/AllOrders";
 
 var routes = [
   {
@@ -259,7 +260,7 @@ var routes = [
     path: "/all-orders",
     name: "All-Orders",
     icon: OrderIcon,
-    component: Orders,
+    component: AllOrders,
     layout: "/super_admin",
     appearInSidebar: true,
     admin: true,

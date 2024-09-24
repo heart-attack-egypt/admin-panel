@@ -279,7 +279,7 @@ export const getConfiguration = `query GetConfiguration{
   }`;
 
 export const orderCount = `
-query OrderCount($restaurant:String!){
+query OrderCount($restaurant:String){
   orderCount(restaurant:$restaurant)
 }`;
 

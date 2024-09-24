@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { withTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 
 import OrderComponent from "../components/Order/Order";
 import OrdersData from "../components/Order/OrdersData";
 import Header from "../components/Headers/Header";
 import { useQuery, gql } from "@apollo/client";
-import { getOrdersByRestaurant } from "../apollo";
+import { getOrders } from "../apollo";
 import useGlobalStyles from "../utils/globalStyles";
 import { Container, Modal } from "@mui/material";
-
+import AllOrdersData from "../components/Order/AllOrdersData";
 const GET_ORDERS = gql`
-  ${getOrdersByRestaurant}
+  ${getOrders}
 `;
 
 const Orders = () => {
@@ -19,20 +20,16 @@ const Orders = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search] = useState("");
-  const restaurantId = localStorage.getItem("restaurantId");
-  const {
-    data,
-    error: errorQuery,
-    loading: loadingQuery,
-    subscribeToMore,
-  } = useQuery(GET_ORDERS, {
-    variables: {
-      restaurant: restaurantId,
-      page: page - 1,
-      rows: rowsPerPage,
-      search: search,
-    },
-  });
+
+  const { data, error: errorQuery, loading: loadingQuery } = useQuery(
+    GET_ORDERS,
+    {
+      variables: {
+        page: page - 1,
+        rows: rowsPerPage,
+      },
+    }
+  );
   const toggleModal = (order) => {
     setOrder(order);
     setDetailModal(!detailsModal);
@@ -50,10 +47,9 @@ const Orders = () => {
             <td>{`${"Error"} ${errorQuery.message}`}</td>
           </tr>
         )}
-        <OrdersData
-          orders={data && data.ordersByRestId}
+        <AllOrdersData
+          orders={data && data.allOrders}
           toggleModal={toggleModal}
-          subscribeToMore={subscribeToMore}
           loading={loadingQuery}
           selected={order}
           updateSelected={setOrder}
