@@ -69,6 +69,11 @@ const AllOrdersData = (props) => {
       selector: "orderId",
     },
     {
+      name: t("restuarant"),
+      cell: (row) => <>{transformToNewline(row.restaurant?.name ?? "", 3)}</>,
+    },
+
+    {
       name: t("Items"),
       cell: (row) => <>{getItems(row.items)}</>,
     },
@@ -82,6 +87,7 @@ const AllOrdersData = (props) => {
       selector: "orderStatus",
       sortable: true,
     },
+
     {
       name: t("Datetime"),
       cell: (row) => (
