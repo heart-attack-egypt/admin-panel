@@ -19,17 +19,6 @@
     "build:prod": "env-cmd -f .env.production react-scripts build",
     "build:staging": "env-cmd -f .env.staging react-scripts build"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.js": [
-      "npm run format",
-      "npm run lint:fix"
-    ]
-  },
   "eslintConfig": {
     "extends": "react-app"
   },
