@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { withTranslation } from "react-i18next";
 import { transformToNewline } from "../../utils/stringManipulations";
 import DataTable from "react-data-table-component";
@@ -10,7 +10,9 @@ import { useQuery, gql } from "@apollo/client";
 import SearchBar from "../TableHeader/SearchBar";
 import { customStyles } from "../../utils/tableCustomStyles";
 import TableHeader from "../TableHeader";
-import { useTheme } from "@mui/material";
+import { Button, useTheme } from "@mui/material";
+import { useReactToPrint } from "react-to-print";
+import { FormatReceipt } from "./format";
 
 const ORDERCOUNT = gql`
   ${orderCount}
@@ -107,6 +109,32 @@ const AllOrdersData = (props) => {
     {
       name: t("phone"),
       cell: (row) => <>{transformToNewline(row.user?.phone ?? "", 3)}</>,
+    },
+    {
+      cell: (row) => {
+        if (!row) return;
+        const componentRef = useRef();
+        const handlePrint = useReactToPrint({
+          content: () => componentRef.current,
+        });
+
+        return (
+          <>
+            <Button
+              style={{ color: "#000" }}
+              size="small"
+              variant="outlined"
+              onClick={handlePrint}
+            >
+              <strong>print order</strong>
+            </Button>
+
+            <div style={{ display: "none" }}>
+              <FormatReceipt ref={componentRef} row={row} />
+            </div>
+          </>
+        );
+      },
     },
   ];
 
