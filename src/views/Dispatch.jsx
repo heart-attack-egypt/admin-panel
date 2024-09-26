@@ -1,40 +1,53 @@
 /* eslint-disable react/display-name */
-import React, { useState } from 'react'
-import { withTranslation } from 'react-i18next'
-import { useQuery, useMutation, useSubscription, gql } from '@apollo/client'
-import DataTable from 'react-data-table-component'
+import React, { useState } from "react";
+import { withTranslation } from "react-i18next";
+import { useQuery, useMutation, useSubscription, gql } from "@apollo/client";
+import DataTable from "react-data-table-component";
 import {
   getActiveOrders,
   getRidersByZone,
   subscriptionOrder,
   updateStatus,
-  assignRider
-} from '../apollo'
-import Header from '../components/Headers/Header'
-import CustomLoader from '../components/Loader/CustomLoader'
-import { transformToNewline } from '../utils/stringManipulations'
-import SearchBar from '../components/TableHeader/SearchBar'
-import useGlobalStyles from '../utils/globalStyles'
-import { customStyles } from '../utils/tableCustomStyles'
-import { Container, MenuItem, Select, Box, useTheme } from '@mui/material'
-import { ReactComponent as DispatchIcon } from '../assets/svg/svg/Dispatch.svg'
-import TableHeader from '../components/TableHeader'
-import { NotificationContainer, NotificationManager } from 'react-notifications'
-import 'react-notifications/lib/notifications.css'
+  assignRider,
+} from "../apollo";
+import Header from "../components/Headers/Header";
+import CustomLoader from "../components/Loader/CustomLoader";
+import { transformToNewline } from "../utils/stringManipulations";
+import SearchBar from "../components/TableHeader/SearchBar";
+import useGlobalStyles from "../utils/globalStyles";
+import { customStyles } from "../utils/tableCustomStyles";
+import { Container, MenuItem, Select, Box, useTheme } from "@mui/material";
+import { ReactComponent as DispatchIcon } from "../assets/svg/svg/Dispatch.svg";
+import TableHeader from "../components/TableHeader";
+import {
+  NotificationContainer,
+  NotificationManager,
+} from "react-notifications";
+import "react-notifications/lib/notifications.css";
 
-const SUBSCRIPTION_ORDER = gql`${subscriptionOrder}`
-const UPDATE_STATUS = gql`${updateStatus}`
-const ASSIGN_RIDER = gql`${assignRider}`
-const GET_RIDERS_BY_ZONE = gql`${getRidersByZone}`
-const GET_ACTIVE_ORDERS = gql`${getActiveOrders}`
+const SUBSCRIPTION_ORDER = gql`
+  ${subscriptionOrder}
+`;
+const UPDATE_STATUS = gql`
+  ${updateStatus}
+`;
+const ASSIGN_RIDER = gql`
+  ${assignRider}
+`;
+const GET_RIDERS_BY_ZONE = gql`
+  ${getRidersByZone}
+`;
+const GET_ACTIVE_ORDERS = gql`
+  ${getActiveOrders}
+`;
 
 const RiderSelect = ({ row, globalClasses, mutateAssign }) => {
   const { data: dataZone, loading, error } = useQuery(GET_RIDERS_BY_ZONE, {
-    variables: { id: row.zone._id }
+    variables: { id: row.zone._id },
   });
 
-  if (loading) return <CustomLoader />;  // Show a loader while loading
-  if (error) return <p>Error loading riders</p>;  // Show an error message
+  if (loading) return <CustomLoader />; // Show a loader while loading
+  if (error) return <p>Error loading riders</p>; // Show an error message
 
   // Use optional chaining and add a check before rendering the riders
   return (
@@ -43,29 +56,37 @@ const RiderSelect = ({ row, globalClasses, mutateAssign }) => {
       name="input-rider"
       value=""
       displayEmpty
-      inputProps={{ 'aria-label': 'Without label' }}
-      style={{ width: '50px' }}
+      inputProps={{ "aria-label": "Without label" }}
+      style={{ width: "50px" }}
       className={globalClasses.selectInput}
     >
       {dataZone?.getRidersByZone?.length > 0 ? (
         dataZone.getRidersByZone.map((rider) => (
           <MenuItem
             key={rider._id}
-            style={{ color: 'black' }}
+            style={{ color: "black" }}
             onClick={() => {
               mutateAssign({
                 variables: {
                   id: row._id,
-                  riderId: rider._id
+                  riderId: rider._id,
                 },
                 onCompleted: (data) => {
-                  console.log('Mutation success data:', data);
-                  NotificationManager.success('Successful', 'Rider updated!', 3000);
+                  console.log("Mutation success data:", data);
+                  NotificationManager.success(
+                    "Successful",
+                    "Rider updated!",
+                    3000
+                  );
                 },
                 onError: (error) => {
-                  console.error('Mutation error:', error);
-                  NotificationManager.error('Error', 'Failed to update rider!', 3000);
-                }
+                  console.error("Mutation error:", error);
+                  NotificationManager.error(
+                    "Error",
+                    "Failed to update rider!",
+                    3000
+                  );
+                },
               });
             }}
           >
@@ -79,24 +100,22 @@ const RiderSelect = ({ row, globalClasses, mutateAssign }) => {
   );
 };
 
-
 const SubscriptionOrder = ({ row }) => {
-  const { data: dataSubscription, error } = useSubscription(SUBSCRIPTION_ORDER, {
-    variables: { id: row._id }
-  });
+  const { data: dataSubscription, error } = useSubscription(
+    SUBSCRIPTION_ORDER,
+    {
+      variables: { id: row._id },
+    }
+  );
 
   if (error) {
     console.error("Subscription error:", error);
   }
 
-  if (!dataSubscription) {
-    return <div>Loading...</div>;  // Show a loading indicator or a fallback
-  }
-
   console.log(dataSubscription);
 
   return (
-    <div style={{ overflow: 'visible', whiteSpace: 'pre' }}>
+    <div style={{ overflow: "visible", whiteSpace: "pre" }}>
       {row.orderId}
       <br />
       {transformToNewline(row.deliveryAddress.deliveryAddress, 3)}
@@ -105,25 +124,25 @@ const SubscriptionOrder = ({ row }) => {
 };
 
 const Orders = (props) => {
-  const theme = useTheme()
-  const { t } = props
-  const [searchQuery, setSearchQuery] = useState('')
-  const onChangeSearch = (e) => setSearchQuery(e.target.value)
-  const [mutateUpdate] = useMutation(UPDATE_STATUS)
-  const globalClasses = useGlobalStyles()
-  const [mutateAssign] = useMutation(ASSIGN_RIDER)
+  const theme = useTheme();
+  const { t } = props;
+  const [searchQuery, setSearchQuery] = useState("");
+  const onChangeSearch = (e) => setSearchQuery(e.target.value);
+  const [mutateUpdate] = useMutation(UPDATE_STATUS);
+  const globalClasses = useGlobalStyles();
+  const [mutateAssign] = useMutation(ASSIGN_RIDER);
 
   const {
     data: dataOrders,
     error: errorOrders,
     loading: loadingOrders,
-    refetch: refetchOrders
-  } = useQuery(GET_ACTIVE_ORDERS, { pollInterval: 3000 })
+    refetch: refetchOrders,
+  } = useQuery(GET_ACTIVE_ORDERS, { pollInterval: 3000 });
 
   const statusFunc = (row) => {
     const handleStatusSuccessNotification = (status) => {
-      NotificationManager.success(status, 'Status Updated!', 3000)
-    }
+      NotificationManager.success(status, "Status Updated!", 3000);
+    };
 
     return (
       <>
@@ -131,159 +150,182 @@ const Orders = (props) => {
           id="input-status"
           name="input-status"
           displayEmpty
-          inputProps={{ 'aria-label': 'Without label' }}
-          style={{ width: '50px' }}
+          inputProps={{ "aria-label": "Without label" }}
+          style={{ width: "50px" }}
           className={globalClasses.selectInput}
         >
-          {row.orderStatus === 'PENDING' && (
+          {row.orderStatus === "PENDING" && (
             <MenuItem
-              style={{ color: 'black' }}
+              style={{ color: "black" }}
               onClick={() => {
                 mutateUpdate({
                   variables: {
                     id: row._id,
-                    orderStatus: 'ACCEPTED'
+                    orderStatus: "ACCEPTED",
                   },
-                  onCompleted: data => {
-                    handleStatusSuccessNotification('ACCEPTED')
-                    refetchOrders()
+                  onCompleted: (data) => {
+                    handleStatusSuccessNotification("ACCEPTED");
+                    refetchOrders();
                   },
-                  onError: error => {
-                    console.error('Mutation error:', error)
-                    NotificationManager.error('Error', 'Failed to update status!', 3000)
-                  }
-                })
+                  onError: (error) => {
+                    console.error("Mutation error:", error);
+                    NotificationManager.error(
+                      "Error",
+                      "Failed to update status!",
+                      3000
+                    );
+                  },
+                });
               }}
             >
-              {t('Accept')}
+              {t("Accept")}
             </MenuItem>
           )}
-          {['PENDING', 'ACCEPTED', 'PICKED', 'ASSIGNED'].includes(row.orderStatus) && (
+          {["PENDING", "ACCEPTED", "PICKED", "ASSIGNED"].includes(
+            row.orderStatus
+          ) && (
             <MenuItem
-              style={{ color: 'black' }}
+              style={{ color: "black" }}
               onClick={() => {
                 mutateUpdate({
                   variables: {
                     id: row._id,
-                    orderStatus: 'CANCELLED'
+                    orderStatus: "CANCELLED",
                   },
-                  onCompleted: data => {
-                    handleStatusSuccessNotification('REJECTED')
-                    refetchOrders()
+                  onCompleted: (data) => {
+                    handleStatusSuccessNotification("REJECTED");
+                    refetchOrders();
                   },
-                  onError: error => {
-                    console.error('Mutation error:', error)
-                    NotificationManager.error('Error', 'Failed to update status!', 3000)
-                  }
-                })
+                  onError: (error) => {
+                    console.error("Mutation error:", error);
+                    NotificationManager.error(
+                      "Error",
+                      "Failed to update status!",
+                      3000
+                    );
+                  },
+                });
               }}
             >
-              {t('Reject')}
+              {t("Reject")}
             </MenuItem>
           )}
-          {['PENDING', 'ACCEPTED', 'PICKED', 'ASSIGNED'].includes(row.orderStatus) && (
+          {["PENDING", "ACCEPTED", "PICKED", "ASSIGNED"].includes(
+            row.orderStatus
+          ) && (
             <MenuItem
-              style={{ color: 'black' }}
+              style={{ color: "black" }}
               onClick={() => {
                 mutateUpdate({
                   variables: {
                     id: row._id,
-                    orderStatus: 'DELIVERED'
+                    orderStatus: "DELIVERED",
                   },
-                  onCompleted: data => {
-                    handleStatusSuccessNotification('DELIVERED')
-                    refetchOrders()
+                  onCompleted: (data) => {
+                    handleStatusSuccessNotification("DELIVERED");
+                    refetchOrders();
                   },
-                  onError: error => {
-                    console.error('Mutation error:', error)
-                    NotificationManager.error('Error', 'Failed to update status!', 3000)
-                  }
-                })
+                  onError: (error) => {
+                    console.error("Mutation error:", error);
+                    NotificationManager.error(
+                      "Error",
+                      "Failed to update status!",
+                      3000
+                    );
+                  },
+                });
               }}
             >
-              {t('Delivered')}
+              {t("Delivered")}
             </MenuItem>
           )}
         </Select>
       </>
-    )
-  }
+    );
+  };
 
   const columns = [
     {
-      name: t('OrderInformation'),
+      name: t("OrderInformation"),
       sortable: true,
-      selector: 'orderId',
-      cell: (row) => <SubscriptionOrder row={row} />
+      selector: "orderId",
+      cell: (row) => <SubscriptionOrder row={row} />,
     },
     {
-      name: t('RestaurantCol'),
-      selector: 'restaurant.name'
+      name: t("RestaurantCol"),
+      selector: "restaurant.name",
     },
     {
-      name: t('Payment'),
-      selector: 'paymentMethod'
+      name: t("Payment"),
+      selector: "paymentMethod",
     },
     {
-      name: t('Status'),
-      selector: 'orderStatus',
+      name: t("Status"),
+      selector: "orderStatus",
       cell: (row) => (
-        <div style={{ overflow: 'visible' }}>
+        <div style={{ overflow: "visible" }}>
           {t(row.orderStatus)}
           <br />
-          {!['CANCELLED', 'DELIVERED'].includes(row.orderStatus) && statusFunc(row)}
+          {!["CANCELLED", "DELIVERED"].includes(row.orderStatus) &&
+            statusFunc(row)}
         </div>
-      )
+      ),
     },
     {
-      name: t('Rider'),
-      selector: 'rider',
+      name: t("Rider"),
+      selector: "rider",
       cell: (row) => (
-        <div style={{ overflow: 'visible' }}>
-          {row.rider ? row.rider.name : ''}
+        <div style={{ overflow: "visible" }}>
+          {row.rider ? row.rider.name : ""}
           <br />
-          {!row.isPickedUp && !['CANCELLED', 'DELIVERED'].includes(row.orderStatus) && (
-            <RiderSelect row={row} globalClasses={globalClasses} mutateAssign={mutateAssign} />
-          )}
+          {!row.isPickedUp &&
+            !["CANCELLED", "DELIVERED"].includes(row.orderStatus) && (
+              <RiderSelect
+                row={row}
+                globalClasses={globalClasses}
+                mutateAssign={mutateAssign}
+              />
+            )}
         </div>
-      )
+      ),
     },
     {
-      name: t('OrderTime'),
+      name: t("OrderTime"),
       cell: (row) => (
-        <>{new Date(row.createdAt).toLocaleString().replace(/ /g, '\n')}</>
-      )
-    }
-  ]
+        <>{new Date(row.createdAt).toLocaleString().replace(/ /g, "\n")}</>
+      ),
+    },
+  ];
 
   const conditionalRowStyles = [
     {
-      when: (row) => ['DELIVERED', 'CANCELLED'].includes(row.orderStatus),
+      when: (row) => ["DELIVERED", "CANCELLED"].includes(row.orderStatus),
       style: {
-        backgroundColor: theme.palette.success.dark
-      }
-    }
-  ]
+        backgroundColor: theme.palette.success.dark,
+      },
+    },
+  ];
   const regex =
-    searchQuery.length > 2 ? new RegExp(searchQuery.toLowerCase(), 'g') : null
+    searchQuery.length > 2 ? new RegExp(searchQuery.toLowerCase(), "g") : null;
 
   const filtered =
     searchQuery.length < 3
       ? dataOrders && dataOrders.getActiveOrders
       : dataOrders &&
-      dataOrders.getActiveOrders.filter((order) => {
-        return (
-          order.restaurant.name.toLowerCase().search(regex) > -1 ||
-          order.orderId.toLowerCase().search(regex) > -1 ||
-          order.deliveryAddress.deliveryAddress.toLowerCase().search(regex) > -1 ||
-          order.orderId.toLowerCase().search(regex) > -1 ||
-          order.paymentMethod.toLowerCase().search(regex) > -1 ||
-          order.orderStatus.toLowerCase().search(regex) > -1 ||
-          (order.rider !== null
-            ? order.rider.name.toLowerCase().search(regex) > -1
-            : false)
-        )
-      })
+        dataOrders.getActiveOrders.filter((order) => {
+          return (
+            order.restaurant.name.toLowerCase().search(regex) > -1 ||
+            order.orderId.toLowerCase().search(regex) > -1 ||
+            order.deliveryAddress.deliveryAddress.toLowerCase().search(regex) >
+              -1 ||
+            order.orderId.toLowerCase().search(regex) > -1 ||
+            order.paymentMethod.toLowerCase().search(regex) > -1 ||
+            order.orderStatus.toLowerCase().search(regex) > -1 ||
+            (order.rider !== null
+              ? order.rider.name.toLowerCase().search(regex) > -1
+              : false)
+          );
+        });
 
   return (
     <>
@@ -296,7 +338,7 @@ const Orders = (props) => {
         {errorOrders ? (
           <tr>
             <td>
-              `${'Error'}! ${errorOrders.message}`
+              `${"Error"}! ${errorOrders.message}`
             </td>
           </tr>
         ) : null}
@@ -312,7 +354,7 @@ const Orders = (props) => {
                 onClick={() => refetchOrders()}
               />
             }
-            title={<TableHeader title={t('Dispatch')} />}
+            title={<TableHeader title={t("Dispatch")} />}
             columns={columns}
             data={filtered}
             progressPending={loadingOrders}
@@ -326,6 +368,6 @@ const Orders = (props) => {
         )}
       </Container>
     </>
-  )
-}
-export default withTranslation()(Orders)
+  );
+};
+export default withTranslation()(Orders);
