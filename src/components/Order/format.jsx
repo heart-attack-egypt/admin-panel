@@ -185,13 +185,6 @@ const Receipt = ({ order }) => {
             </Typography>
           </Grid>
         </Grid>
-
-        {/* Footer */}
-        <Box sx={{ marginY: 3 }}>
-          <Typography style={{ color: "#000" }} variant="subtitle1">
-            <strong>Thank you for your business!</strong>
-          </Typography>
-        </Box>
       </Paper>
     </Box>
   );
