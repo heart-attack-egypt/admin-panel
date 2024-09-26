@@ -60,8 +60,8 @@ const RiderSelect = ({ row, globalClasses, mutateAssign }) => {
       style={{ width: "50px" }}
       className={globalClasses.selectInput}
     >
-      {dataZone?.getRidersByZone?.length > 0 ? (
-        dataZone.getRidersByZone.map((rider) => (
+      {dataZone?.ridersByZone?.length > 0 ? (
+        dataZone.ridersByZone.map((rider) => (
           <MenuItem
             key={rider._id}
             style={{ color: "black" }}
