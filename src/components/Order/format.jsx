@@ -35,6 +35,7 @@ const Receipt = ({ order }) => {
     deliveryCharges,
     currencySymbol,
     items,
+    orderId,
   } = order;
   let email, phone;
   if (order.user) {
@@ -85,6 +86,9 @@ const Receipt = ({ order }) => {
         {/* Company Info */}
         <Typography variant="h4" style={{ color: "#000" }}>
           Heart Attack
+        </Typography>
+        <Typography variant="h5" style={{ color: "#000" }}>
+          order id : {orderId}
         </Typography>
 
         {/* Contact Info */}
