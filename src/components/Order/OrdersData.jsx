@@ -27,7 +27,16 @@ const OrdersData = (props) => {
   const { t } = props;
   const { selected, updateSelected } = props;
   const [searchQuery, setSearchQuery] = useState("");
-  const onChangeSearch = (e) => setSearchQuery(e.target.value);
+
+  const onChangeSearch = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // Call the setSearchQuery passed from the parent component
+    if (value.length >= 3 || value.length === 0) {
+      props.setSearchQuery(value); // Trigger search query when length is greater than 2
+    }
+  };
 
   const getItems = (items) => {
     return items
@@ -44,24 +53,6 @@ const OrdersData = (props) => {
   const { data, loading: loadingQuery } = useQuery(ORDERCOUNT, {
     variables: { restaurant: restaurantId },
   });
-
-  const propExists = (obj, path) => {
-    return path.split(".").reduce((obj, prop) => {
-      return obj && obj[prop] ? obj[prop] : "";
-    }, obj);
-  };
-
-  const customSort = (rows, field, direction) => {
-    const handleField = (row) => {
-      if (field && isNaN(propExists(row, field))) {
-        return propExists(row, field).toLowerCase();
-      }
-
-      return row[field];
-    };
-
-    return orderBy(rows, handleField, direction);
-  };
 
   const handlePerRowsChange = (perPage, page) => {
     props.page(page);
@@ -155,32 +146,52 @@ const OrdersData = (props) => {
     },
   ];
   useEffect(() => {
-    props.subscribeToMore({
+    const unsubscribe = props.subscribeToMore({
       document: ORDER_PLACED,
       variables: { id: restaurantId },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
+
+        const newOrder = subscriptionData.data.subscribePlaceOrder.order;
+
         if (subscriptionData.data.subscribePlaceOrder.origin === "new") {
+          // If it's a new order, prepend it to the list immutably
           return {
-            ordersByRestId: [
-              subscriptionData.data.subscribePlaceOrder.order,
-              ...prev.ordersByRestId,
-            ],
+            ...prev, // Spread prev to maintain other parts of the state
+            ordersByRestId: [newOrder, ...prev.ordersByRestId],
           };
         } else {
+          // If it's an update to an existing order, find and update it immutably
           const orderIndex = prev.ordersByRestId.findIndex(
-            (o) => subscriptionData.data.subscribePlaceOrder.order._id === o._id
+            (o) => o._id === newOrder._id
           );
-          prev.ordersByRestId[orderIndex] =
-            subscriptionData.data.subscribePlaceOrder.order;
-          return { ordersByRestId: [...prev.ordersByRestId] };
+
+          // If the order is found, update it
+          if (orderIndex > -1) {
+            const updatedOrders = [
+              ...prev.ordersByRestId.slice(0, orderIndex),
+              newOrder,
+              ...prev.ordersByRestId.slice(orderIndex + 1),
+            ];
+
+            return {
+              ...prev, // Spread prev to maintain other parts of the state
+              ordersByRestId: updatedOrders,
+            };
+          }
+
+          // If the order is not found, return the previous state
+          return prev;
         }
       },
       onError: (error) => {
-        console.log("onError", error);
+        console.error("Subscription error:", error);
       },
     });
-  }, []);
+
+    // Unsubscribe when component unmounts
+    return () => unsubscribe();
+  }, [restaurantId, props]);
   useEffect(() => {
     if (selected) {
       const order = props.orders.find((o) => o._id === selected._id);
@@ -188,28 +199,16 @@ const OrdersData = (props) => {
     }
   }, [props.orders]);
 
-  const regex =
-    searchQuery.length > 2 ? new RegExp(searchQuery.toLowerCase(), "g") : null;
-
-  const filtered =
-    searchQuery.length < 3
-      ? props && props.orders
-      : props.orders &&
-        props.orders.filter((order) => {
-          return order.orderId.toLowerCase().search(regex) > -1;
-        });
-
   return (
     <>
       <DataTable
         title={<TableHeader title={t("Orders")} />}
         columns={columns}
-        data={filtered}
+        data={props.orders || []}
         onRowClicked={props.toggleModal}
         progressPending={props.loading || loadingQuery}
         pointerOnHover
         progressComponent={<CustomLoader />}
-        sortFunction={customSort}
         subHeader
         subHeaderComponent={
           <SearchBar value={searchQuery} onChange={onChangeSearch} />

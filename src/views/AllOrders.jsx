@@ -19,17 +19,18 @@ const Orders = () => {
   const [order, setOrder] = useState(null);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [search] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, error: errorQuery, loading: loadingQuery } = useQuery(
+  const { data, error: errorQuery, loading: loadingQuery, refetch } = useQuery(
     GET_ORDERS,
     {
       variables: {
-        page: page - 1,
-        rows: rowsPerPage,
+        page: searchQuery ? 0 : page - 1,
+        search: searchQuery, // Pass the search query to the query variables
       },
     }
   );
+
   const toggleModal = (order) => {
     setOrder(order);
     setDetailModal(!detailsModal);
@@ -55,6 +56,7 @@ const Orders = () => {
           updateSelected={setOrder}
           page={setPage}
           rows={setRowsPerPage}
+          setSearchQuery={setSearchQuery} // Pass the search function to AllOrdersData
         />
         <Modal
           style={{

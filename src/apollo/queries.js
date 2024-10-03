@@ -1,5 +1,5 @@
-export const getOrders = `query Orders($page:Int){
-    allOrders(page:$page){
+export const getOrders = `query Orders($page:Int, $search:String){
+    allOrders(page:$page, search:$search){
       _id
       orderId
       restaurant{
@@ -279,10 +279,9 @@ export const getConfiguration = `query GetConfiguration{
   }`;
 
 export const orderCount = `
-query OrderCount($restaurant:String){
-  orderCount(restaurant:$restaurant)
-}`;
-
+  query OrderCount($restaurant: String, $search: String) {
+    orderCount(restaurant: $restaurant, search: $search)
+  }`;
 export const getActiveOrders = `query GetActiveOrders($restaurantId:ID){
   getActiveOrders(restaurantId:$restaurantId){
     _id
