@@ -282,15 +282,6 @@ function Order(props) {
             {success}
           </Alert>
         )}
-        {error && (
-          <Alert
-            className={globalClasses.alertError}
-            variant="filled"
-            severity="error"
-          >
-            {error}
-          </Alert>
-        )}
       </Box>
     </Box>
   );
