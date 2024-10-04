@@ -10,20 +10,29 @@ import { useQuery, gql } from "@apollo/client";
 import SearchBar from "../TableHeader/SearchBar";
 import { customStyles } from "../../utils/tableCustomStyles";
 import TableHeader from "../TableHeader";
-import { Button, useTheme } from "@mui/material";
+import { Button, Select, useTheme } from "@mui/material";
 import { useReactToPrint } from "react-to-print";
 import { FormatReceipt } from "./format";
 
 const ORDERCOUNT = gql`
   ${orderCount}
 `;
-
 const AllOrdersData = (props) => {
   const theme = useTheme();
   const { t } = props;
   const { selected, updateSelected } = props;
   const [searchQuery, setSearchQuery] = useState("");
-  const onChangeSearch = (e) => setSearchQuery(e.target.value);
+
+  const onChangeSearch = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // Call the setSearchQuery passed from the parent component
+    if (value.length >= 3 || value.length === 0) {
+      props.setSearchQuery(value); // Trigger search query when length is greater than 2
+      props.page(1);
+    }
+  };
   const getItems = (items) => {
     return items
       .map(
@@ -35,7 +44,9 @@ const AllOrdersData = (props) => {
       .join("\n");
   };
 
-  const { data, loading: loadingQuery } = useQuery(ORDERCOUNT);
+  const { data, loading: loadingQuery } = useQuery(ORDERCOUNT, {
+    variables: { search: searchQuery },
+  });
   console.log("conets :", data);
   const propExists = (obj, path) => {
     return path.split(".").reduce((obj, prop) => {
@@ -71,7 +82,7 @@ const AllOrdersData = (props) => {
       selector: "orderId",
     },
     {
-      name: t("restuarant"),
+      name: t("Restaurant"),
       cell: (row) => <>{transformToNewline(row.restaurant?.name ?? "", 3)}</>,
     },
 
@@ -154,23 +165,12 @@ const AllOrdersData = (props) => {
     }
   }, [props.orders]);
 
-  const regex =
-    searchQuery.length > 2 ? new RegExp(searchQuery.toLowerCase(), "g") : null;
-
-  const filtered =
-    searchQuery.length < 3
-      ? props && props.orders
-      : props.orders &&
-        props.orders.filter((order) => {
-          return order.orderId.toLowerCase().search(regex) > -1;
-        });
-
   return (
     <>
       <DataTable
         title={<TableHeader title={t("Orders")} />}
         columns={columns}
-        data={filtered}
+        data={props.orders}
         onRowClicked={props.toggleModal}
         progressPending={props.loading || loadingQuery}
         pointerOnHover

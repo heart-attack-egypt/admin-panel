@@ -18,7 +18,7 @@ const Orders = () => {
   const [order, setOrder] = useState(null);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [search] = useState("");
+  const [search, setSearchQuery] = useState("");
   const restaurantId = localStorage.getItem("restaurantId");
   const {
     data,
@@ -57,6 +57,7 @@ const Orders = () => {
           loading={loadingQuery}
           selected={order}
           updateSelected={setOrder}
+          setSearchQuery={setSearchQuery} // Pass the search function to AllOrdersData
           page={setPage}
           rows={setRowsPerPage}
         />
