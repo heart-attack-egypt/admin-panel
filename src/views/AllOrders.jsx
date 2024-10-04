@@ -25,7 +25,7 @@ const Orders = () => {
     GET_ORDERS,
     {
       variables: {
-        page: searchQuery ? 0 : page - 1,
+        page: page - 1,
         search: searchQuery, // Pass the search query to the query variables
       },
     }

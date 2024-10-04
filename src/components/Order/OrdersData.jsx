@@ -35,6 +35,7 @@ const OrdersData = (props) => {
     // Call the setSearchQuery passed from the parent component
     if (value.length >= 3 || value.length === 0) {
       props.setSearchQuery(value); // Trigger search query when length is greater than 2
+      props.page(1);
     }
   };
 
