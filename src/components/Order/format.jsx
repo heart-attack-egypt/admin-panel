@@ -261,7 +261,7 @@ const Receipt = ({ order }) => {
           </Grid>
 
           {/* Paid Amount */}
-         {/*  <Grid item xs={6}>
+          {/*  <Grid item xs={6}>
             <Typography variant="body1" sx={{ color: "#333" }}>
               Paid Amount:
             </Typography>
