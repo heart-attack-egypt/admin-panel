@@ -10,9 +10,10 @@ import { useQuery, gql } from "@apollo/client";
 import SearchBar from "../TableHeader/SearchBar";
 import { customStyles } from "../../utils/tableCustomStyles";
 import TableHeader from "../TableHeader";
-import { Button, Select, useTheme } from "@mui/material";
+import { Button, Chip, Select, useTheme } from "@mui/material";
 import { useReactToPrint } from "react-to-print";
 import { FormatReceipt } from "./format";
+import PrintIcon from "@mui/icons-material/Print";
 
 const ORDERCOUNT = gql`
   ${orderCount}
@@ -70,7 +71,31 @@ const AllOrdersData = (props) => {
     props.page(page);
     props.rows(perPage);
   };
-
+  const renderStatusLabel = (status) => {
+    let color = "default";
+    switch (status) {
+      case "PENDING":
+        color = "#FFCC80"; // Light Orange for Processing
+        break;
+      case "ACCEPTED":
+        color = "#64B5F6"; // Light Blue for Waiting
+        break;
+      case "DELIVERED":
+        color = "#81C784"; // Soft Green for Delivered
+        break;
+      case "CANCELLED":
+        color = "#E0E0E0"; // Light Gray for Cancelled
+        break;
+      default:
+        color = "#E0E0E0"; // Default Light Gray
+    }
+    return (
+      <Chip
+        label={status}
+        style={{ backgroundColor: color, color: "#000", fontWeight: "bold" }}
+      />
+    );
+  };
   const handlePageChange = async (page) => {
     props.page(page);
   };
@@ -79,51 +104,54 @@ const AllOrdersData = (props) => {
     {
       name: t("OrderID"),
       sortable: true,
+      style: { fontWeight: "bold" },
       selector: "orderId",
+      center: true, // Center column content
     },
-    {
-      name: t("Restaurant"),
-      cell: (row) => <>{transformToNewline(row.restaurant?.name ?? "", 3)}</>,
-    },
-
     {
       name: t("Items"),
       cell: (row) => <>{getItems(row.items)}</>,
+      center: true,
     },
     {
       name: t("Payment"),
       selector: "paymentMethod",
       sortable: true,
+      center: true,
     },
     {
       name: t("Status"),
-      selector: "orderStatus",
-      sortable: true,
+      cell: (row) => renderStatusLabel(row.orderStatus),
+      center: true,
     },
-
     {
       name: t("Datetime"),
-      cell: (row) => (
-        <>{new Date(row.createdAt).toLocaleString().replace(/ /g, "\n")}</>
-      ),
+      cell: (row) => <>{new Date(row.createdAt).toLocaleString()}</>,
+      center: true,
     },
     {
       name: t("Address"),
       cell: (row) => (
         <>{transformToNewline(row.deliveryAddress.deliveryAddress, 3)}</>
       ),
+      center: true,
     },
     {
-      name: t("name"),
+      name: t("Name"),
       cell: (row) => <>{transformToNewline(row.user?.name ?? "", 3)}</>,
+      center: true,
     },
     {
-      name: t("phone"),
+      name: t("Phone"),
       cell: (row) => <>{transformToNewline(row.user?.phone ?? "", 3)}</>,
+      center: true,
     },
     {
+      name: t("printOrder"),
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
       cell: (row) => {
-        if (!row) return;
         const componentRef = useRef();
         const handlePrint = useReactToPrint({
           content: () => componentRef.current,
@@ -132,12 +160,13 @@ const AllOrdersData = (props) => {
         return (
           <>
             <Button
-              style={{ color: "#000" }}
+              variant="contained"
+              color="primary"
               size="small"
-              variant="outlined"
               onClick={handlePrint}
+              startIcon={<PrintIcon />}
             >
-              <strong>print order</strong>
+              Print
             </Button>
 
             <div style={{ display: "none" }}>
@@ -146,18 +175,57 @@ const AllOrdersData = (props) => {
           </>
         );
       },
+      center: true,
     },
   ];
 
   const conditionalRowStyles = [
     {
-      when: (row) =>
-        row.orderStatus !== "DELIVERED" && row.orderStatus !== "CANCELLED",
+      when: (row) => row.orderStatus === "DELIVERED",
       style: {
-        backgroundColor: theme.palette.warning.lightest,
+        backgroundColor: "#E8F5E9", // Very light green for delivered
+      },
+    },
+    {
+      when: (row) => row.orderStatus === "PENDING",
+      style: {
+        backgroundColor: "#FFF3E0", // Very light orange for processing
+      },
+    },
+    {
+      when: (row) => row.orderStatus === "ACCEPTED",
+      style: {
+        backgroundColor: "#E3F2FD", // Very light blue for waiting
+      },
+    },
+    {
+      when: (row) => row.orderStatus === "CANCELLED",
+      style: {
+        backgroundColor: "#F5F5F5", // Very light gray for cancelled
       },
     },
   ];
+  const customTableStyles = {
+    headCells: {
+      style: {
+        fontSize: "16px",
+        fontWeight: "bold",
+
+        justifyContent: "center", // Center align header content
+        textAlign: "center",
+        backgroundColor: theme.palette.background.default,
+        padding: "10px",
+      },
+    },
+    cells: {
+      style: {
+        justifyContent: "center", // Center align cell content
+        textAlign: "center",
+
+        padding: "8px",
+      },
+    },
+  };
   useEffect(() => {
     if (selected) {
       const order = props.orders.find((o) => o._id === selected._id);
@@ -186,7 +254,7 @@ const AllOrdersData = (props) => {
         onChangeRowsPerPage={handlePerRowsChange}
         onChangePage={handlePageChange}
         conditionalRowStyles={conditionalRowStyles}
-        customStyles={customStyles}
+        customStyles={customTableStyles}
         selectableRows
         paginationIconLastPage=""
         paginationIconFirstPage=""
