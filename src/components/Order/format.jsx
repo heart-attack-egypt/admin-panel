@@ -30,13 +30,33 @@ const Receipt = ({ order }) => {
 
   const {
     taxationAmount: tax,
-    tipping: tip,
+    tipping,
     paidAmount,
     orderAmount,
-    deliveryCharges,
     currencySymbol,
     items,
   } = order;
+
+  // Calculate subtotal (total cost of items)
+  const subtotal = items.reduce((acc, item) => {
+    return acc + item.variation.price * item.quantity;
+  }, 0);
+
+  // Delivery charges (fees)
+  const deliveryCharges = order.deliveryCharges ? order.deliveryCharges : 0;
+
+  // Tips
+  const tips = tipping;
+
+  // Calculate the total (subtotal + fees + tips)
+  const total = subtotal + deliveryCharges + tips + tax;
+
+  // Discount amount (if any)
+  const discountAmount = total - orderAmount; // Calculate discount
+  const discount = discountAmount > 0; // Check if there is a discount
+
+  // Amount to pay
+  const amountToPay = discount ? orderAmount : total;
 
   let email, phone;
   if (order.user) {
@@ -137,28 +157,20 @@ const Receipt = ({ order }) => {
 
         {/* Summary */}
         <Grid container spacing={2} justifyContent="flex-end">
+          {/* Subtotal */}
           <Grid item xs={6}>
             <Typography variant="body1" sx={{ color: "#333" }}>
-              Tax:
+              Subtotal:
             </Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography variant="body1" sx={{ color: "#333" }} align="right">
               {currencySymbol}
-              {tax.toFixed(2)}
+              {subtotal.toFixed(2)}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1" sx={{ color: "#333" }}>
-              Tip:
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1" sx={{ color: "#333" }} align="right">
-              {currencySymbol}
-              {tip.toFixed(2)}
-            </Typography>
-          </Grid>
+
+          {/* Delivery Charges (Fees) */}
           <Grid item xs={6}>
             <Typography variant="body1" sx={{ color: "#333" }}>
               Delivery Charges:
@@ -170,18 +182,82 @@ const Receipt = ({ order }) => {
               {deliveryCharges.toFixed(2)}
             </Typography>
           </Grid>
+
+          {/* Tips */}
           <Grid item xs={6}>
             <Typography variant="body1" sx={{ color: "#333" }}>
-              Total Amount:
+              Tip:
             </Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography variant="body1" sx={{ color: "#333" }} align="right">
               {currencySymbol}
-              {orderAmount.toFixed(2)}
+              {tips.toFixed(2)}
+            </Typography>
+          </Grid>
+
+          {/* Tax */}
+          <Grid item xs={6}>
+            <Typography variant="body1" sx={{ color: "#333" }}>
+              Tax:
             </Typography>
           </Grid>
           <Grid item xs={6}>
+            <Typography variant="body1" sx={{ color: "#333" }} align="right">
+              {currencySymbol}
+              {tax.toFixed(2)}
+            </Typography>
+          </Grid>
+
+          {/* Total */}
+          <Grid item xs={6}>
+            <Typography variant="body1" sx={{ color: "#333" }}>
+              Total (Subtotal + Fees + Tips):
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body1" sx={{ color: "#333" }} align="right">
+              {currencySymbol}
+              {total.toFixed(2)}
+            </Typography>
+          </Grid>
+
+          {/* Discount (if applicable) */}
+          {discount && (
+            <>
+              <Grid item xs={6}>
+                <Typography variant="body1" sx={{ color: "#333" }}>
+                  Discount:
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body1"
+                  sx={{ color: "#333" }}
+                  align="right"
+                >
+                  -{currencySymbol}
+                  {discountAmount.toFixed(2)}
+                </Typography>
+              </Grid>
+            </>
+          )}
+
+          {/* Amount to Pay */}
+          <Grid item xs={6}>
+            <Typography variant="body1" sx={{ color: "#333" }}>
+              Amount to Pay:
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body1" sx={{ color: "#333" }} align="right">
+              {currencySymbol}
+              {amountToPay.toFixed(2)}
+            </Typography>
+          </Grid>
+
+          {/* Paid Amount */}
+         {/*  <Grid item xs={6}>
             <Typography variant="body1" sx={{ color: "#333" }}>
               Paid Amount:
             </Typography>
@@ -191,7 +267,7 @@ const Receipt = ({ order }) => {
               {currencySymbol}
               {paidAmount.toFixed(2)}
             </Typography>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Paper>
     </Box>

@@ -48,7 +48,7 @@ const AllOrdersData = (props) => {
   const { data, loading: loadingQuery } = useQuery(ORDERCOUNT, {
     variables: { search: searchQuery },
   });
-  console.log("conets :", data);
+ 
   const propExists = (obj, path) => {
     return path.split(".").reduce((obj, prop) => {
       return obj && obj[prop] ? obj[prop] : "";

@@ -70,17 +70,24 @@ function Order(props) {
 
   if (!props.order) return null;
 
-  const total = order.items.reduce((acc, item) => {
+  // Calculate order summary values
+  const subtotal = order.items.reduce((acc, item) => {
     return acc + item.variation.price * item.quantity;
-  }, 0); // Calculate total price of order items
+  }, 0); // Subtotal
 
-  const deliveryCharges = order.deliveryCharges ? order.deliveryCharges : 0;
-  const grandTotal = total + deliveryCharges; // Calculate grand total of order items
+  const deliveryCharges = order.deliveryCharges ? order.deliveryCharges : 0; // Delivery fee
+  const tips = order.tipping; // Tips
+  const tax = order.taxationAmount; // Tax amount
 
-  const discountAmount = grandTotal - order.orderAmount; // Calculate discount
-  const discount = discountAmount > 0; // Check if there is a discount
-  const amountToPay = order.orderAmount; // Amount user will pay
-  const tips = order.tipping;
+  // Calculate the total (subtotal + fees + tips + tax)
+  const total = subtotal + deliveryCharges + tips + tax;
+
+  // Calculate discount
+  const discountAmount = total - order.orderAmount;
+  const discount = discountAmount > 0;
+
+  // Amount to pay
+  const amountToPay = discount ? order.orderAmount : total;
 
   return (
     <Box
@@ -195,7 +202,7 @@ function Order(props) {
               <Grid container spacing={2}>
                 <Grid item lg={6}>
                   <Typography variant="body1" sx={{ color: "#ffffff" }}>
-                    {t("Total Order")}
+                    {t("Subtotal")}
                   </Typography>
                 </Grid>
                 <Grid item lg={6}>
@@ -206,7 +213,7 @@ function Order(props) {
                       color: "#ff5733",
                     }}
                   >
-                    {data.configuration.currencySymbol} {total.toFixed(2)}
+                    {data.configuration.currencySymbol} {subtotal.toFixed(2)}
                   </Typography>
                 </Grid>
 
@@ -227,6 +234,7 @@ function Order(props) {
                     {deliveryCharges.toFixed(2)}
                   </Typography>
                 </Grid>
+
                 <Grid item lg={6}>
                   <Typography variant="body1" sx={{ color: "#ffffff" }}>
                     {t("Tip")}
@@ -241,6 +249,40 @@ function Order(props) {
                     }}
                   >
                     {data.configuration.currencySymbol} {tips.toFixed(2)}
+                  </Typography>
+                </Grid>
+
+                <Grid item lg={6}>
+                  <Typography variant="body1" sx={{ color: "#ffffff" }}>
+                    {t("Tax")}
+                  </Typography>
+                </Grid>
+                <Grid item lg={6}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#ff5733",
+                    }}
+                  >
+                    {data.configuration.currencySymbol} {tax.toFixed(2)}
+                  </Typography>
+                </Grid>
+
+                <Grid item lg={6}>
+                  <Typography variant="body1" sx={{ color: "#ffffff" }}>
+                    {t("Total (Subtotal + Fees + Tips)")}
+                  </Typography>
+                </Grid>
+                <Grid item lg={6}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#ffcc00",
+                    }}
+                  >
+                    {data.configuration.currencySymbol} {total.toFixed(2)}
                   </Typography>
                 </Grid>
 
