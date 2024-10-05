@@ -184,6 +184,35 @@ function Order(props) {
                 </Grid>
               </Box>
             ))}
+            {order.instructions && (
+              <>
+                <Box
+                  sx={{
+                    mb: 2,
+                    p: 2,
+                    borderRadius: 2,
+                    backgroundColor: "#3e3e3e",
+                    color: "#ffffff",
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      mb: 2,
+                      fontWeight: "bold",
+                      color: "#ffcc00",
+                    }}
+                  >
+                    {t("Note")}
+                  </Typography>
+                  <Grid lg={7}>
+                    <Typography variant="body1">
+                      {`comment : ${order.instructions}`}
+                    </Typography>
+                  </Grid>
+                </Box>
+              </>
+            )}
           </Box>
 
           {/* Total, Discount, Delivery Fee, and Amount to Pay Section */}

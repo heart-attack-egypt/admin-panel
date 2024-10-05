@@ -2,6 +2,7 @@ export const getOrders = `query Orders($page:Int, $search:String){
     allOrders(page:$page, search:$search){
       _id
       orderId
+      instructions
       restaurant{
         _id
         name
@@ -112,6 +113,7 @@ export const getOrdersByRestaurant = `query ordersByRestId($restaurant:String!,$
     ordersByRestId(restaurant:$restaurant,page:$page,rows:$rows,search:$search){
       _id
       orderId
+    instructions
       restaurant{
         _id
         name
