@@ -6,7 +6,6 @@ import { updateOrderStatus, getConfiguration } from "../../apollo";
 import Loader from "react-loader-spinner";
 import {
   Box,
-  Divider,
   Grid,
   Typography,
   Alert,
@@ -71,6 +70,18 @@ function Order(props) {
 
   if (!props.order) return null;
 
+  const total = order.items.reduce((acc, item) => {
+    return acc + item.variation.price * item.quantity;
+  }, 0); // Calculate total price of order items
+
+  const deliveryCharges = order.deliveryCharges ? order.deliveryCharges : 0;
+  const grandTotal = total + deliveryCharges; // Calculate grand total of order items
+
+  const discountAmount = grandTotal - order.orderAmount; // Calculate discount
+  const discount = discountAmount > 0; // Check if there is a discount
+  const amountToPay = order.orderAmount; // Amount user will pay
+  const tips = order.tipping;
+
   return (
     <Box
       sx={{
@@ -79,20 +90,18 @@ function Order(props) {
         left: 0,
         right: 0,
         margin: "auto",
-        position: "absolute", // Change to absolute for centering
-        top: "50%", // Center vertically
-        left: "30%", // Center horizontally
-
-        transform: "translate(-10%, -50%)", // Offset for true center
+        position: "absolute",
+        top: "50%",
+        left: "30%",
+        transform: "translate(-10%, -50%)",
       }}
     >
       <Card
         sx={{
           boxShadow: 3,
           borderRadius: 3,
-
           overflow: "hidden",
-          backgroundColor: "#2e2e2e", // Dark background for contrast
+          backgroundColor: "#2e2e2e",
         }}
       >
         <CardContent>
@@ -102,8 +111,8 @@ function Order(props) {
               variant="h5"
               sx={{
                 fontWeight: "bold",
-                color: "#ffcc00", // Gold-like color for restaurant vibe
-                borderBottom: `2px solid #ff5733`, // Vibrant red-orange for accents
+                color: "#ffcc00",
+                borderBottom: `2px solid #ff5733`,
                 pb: 1,
               }}
             >
@@ -118,7 +127,7 @@ function Order(props) {
               sx={{
                 mb: 2,
                 fontWeight: "bold",
-                color: "#ffcc00", // Gold color for section headers
+                color: "#ffcc00",
               }}
             >
               {t("Items")}
@@ -130,8 +139,8 @@ function Order(props) {
                   mb: 2,
                   p: 2,
                   borderRadius: 2,
-                  backgroundColor: "#3e3e3e", // Dark gray background for item sections
-                  color: "#ffffff", // White text for visibility
+                  backgroundColor: "#3e3e3e",
+                  color: "#ffffff",
                 }}
               >
                 <Grid container alignItems="center" spacing={2}>
@@ -140,7 +149,7 @@ function Order(props) {
                       variant="body1"
                       sx={{
                         fontWeight: "bold",
-                        color: "#ffcc00", // Gold for quantity
+                        color: "#ffcc00",
                       }}
                     >
                       {item.quantity}
@@ -158,7 +167,7 @@ function Order(props) {
                       variant="body1"
                       sx={{
                         fontWeight: "bold",
-                        color: "#ff5733", // Red-orange for prices
+                        color: "#ff5733",
                       }}
                     >
                       {data.configuration.currencySymbol}{" "}
@@ -166,50 +175,27 @@ function Order(props) {
                     </Typography>
                   </Grid>
                 </Grid>
-                {item.specialInstructions.length > 0 && (
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "#ffc107", // Bright yellow for special instructions
-                      mt: 1,
-                    }}
-                  >
-                    {t("SpecialInstructions")}
-                  </Typography>
-                )}
               </Box>
             ))}
           </Box>
 
-          {/* Payment Method Section */}
+          {/* Total, Discount, Delivery Fee, and Amount to Pay Section */}
           <Box sx={{ mb: 3 }}>
             <Typography
               variant="h6"
               sx={{
                 mb: 2,
                 fontWeight: "bold",
-                color: "#ffcc00", // Gold color for section headers
+                color: "#ffcc00",
               }}
             >
-              {t("PaymentMethod")}
+              {t("Order Summary")}
             </Typography>
-            <Box
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                backgroundColor: "#3e3e3e", // Dark gray for payment section
-              }}
-            >
-              <Grid container spacing={2} alignItems="center">
-                <Grid item lg={6} sx={{ textAlign: "center" }}>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: "bold",
-                      color: "#ffcc00", // Gold for payment method text
-                    }}
-                  >
-                    {order.paymentMethod}
+            <Box sx={{ p: 2, backgroundColor: "#3e3e3e", borderRadius: 2 }}>
+              <Grid container spacing={2}>
+                <Grid item lg={6}>
+                  <Typography variant="body1" sx={{ color: "#ffffff" }}>
+                    {t("Total Order")}
                   </Typography>
                 </Grid>
                 <Grid item lg={6}>
@@ -217,11 +203,83 @@ function Order(props) {
                     variant="body1"
                     sx={{
                       fontWeight: "bold",
-                      color: "#ff5733", // Red-orange for payment amount
+                      color: "#ff5733",
+                    }}
+                  >
+                    {data.configuration.currencySymbol} {total.toFixed(2)}
+                  </Typography>
+                </Grid>
+
+                <Grid item lg={6}>
+                  <Typography variant="body1" sx={{ color: "#ffffff" }}>
+                    {t("Delivery Fee")}
+                  </Typography>
+                </Grid>
+                <Grid item lg={6}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#ff5733",
                     }}
                   >
                     {data.configuration.currencySymbol}{" "}
-                    {order.paidAmount ? order.paidAmount.toFixed(2) : 0}
+                    {deliveryCharges.toFixed(2)}
+                  </Typography>
+                </Grid>
+                <Grid item lg={6}>
+                  <Typography variant="body1" sx={{ color: "#ffffff" }}>
+                    {t("Tip")}
+                  </Typography>
+                </Grid>
+                <Grid item lg={6}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#ff5733",
+                    }}
+                  >
+                    {data.configuration.currencySymbol} {tips.toFixed(2)}
+                  </Typography>
+                </Grid>
+
+                {discount && (
+                  <>
+                    <Grid item lg={6}>
+                      <Typography variant="body1" sx={{ color: "#ffffff" }}>
+                        {t("Discount")}
+                      </Typography>
+                    </Grid>
+                    <Grid item lg={6}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: "bold",
+                          color: "#ff5733",
+                        }}
+                      >
+                        -{data.configuration.currencySymbol}{" "}
+                        {discountAmount.toFixed(2)}
+                      </Typography>
+                    </Grid>
+                  </>
+                )}
+
+                <Grid item lg={6}>
+                  <Typography variant="body1" sx={{ color: "#ffffff" }}>
+                    {t("Amount to Pay")}
+                  </Typography>
+                </Grid>
+                <Grid item lg={6}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#ffcc00",
+                    }}
+                  >
+                    {data.configuration.currencySymbol} {amountToPay.toFixed(2)}
                   </Typography>
                 </Grid>
               </Grid>
@@ -236,14 +294,14 @@ function Order(props) {
               sx={{
                 justifyContent: "space-between",
                 p: 3,
-                backgroundColor: "#2e2e2e", // Dark background for action section
+                backgroundColor: "#2e2e2e",
               }}
             >
               {loading && (
                 <Loader
                   className="text-center"
                   type="TailSpin"
-                  color="#ff5733" // Vibrant color for loading spinner
+                  color="#ff5733"
                   height={40}
                   width={40}
                   visible={loading}
@@ -264,9 +322,9 @@ function Order(props) {
                 sx={{
                   borderRadius: 3,
                   boxShadow: 2,
-                  backgroundColor: "#4caf50", // Green for accept button
+                  backgroundColor: "#4caf50",
                   "&:hover": { backgroundColor: "#388e3c" },
-                  color: "#ffffff", // White text for contrast
+                  color: "#ffffff",
                 }}
               >
                 {order.status === true ? t("Accepted") : t("Accept")}
@@ -284,9 +342,9 @@ function Order(props) {
                 sx={{
                   borderRadius: 3,
                   boxShadow: 2,
-                  backgroundColor: "#f44336", // Red for cancel button
+                  backgroundColor: "#f44336",
                   "&:hover": { backgroundColor: "#d32f2f" },
-                  color: "#ffffff", // White text for contrast
+                  color: "#ffffff",
                 }}
               >
                 {order.status === false ? t("Cancelled") : t("Cancel")}
@@ -302,10 +360,10 @@ function Order(props) {
                 sx={{
                   mx: 2,
                   borderRadius: 2,
-                  borderColor: reasonError ? "error.main" : "#ffc107", // Bright yellow border on input
+                  borderColor: reasonError ? "error.main" : "#ffc107",
                   px: 1,
-                  backgroundColor: "#424242", // Darker gray for input field
-                  color: "#ffffff", // White text
+                  backgroundColor: "#424242",
+                  color: "#ffffff",
                   border: "1px solid",
                 }}
               />
@@ -320,7 +378,7 @@ function Order(props) {
               severity="success"
               sx={{
                 borderRadius: 2,
-                backgroundColor: "#4caf50", // Green for success alert
+                backgroundColor: "#4caf50",
                 color: "#ffffff",
               }}
             >
@@ -333,7 +391,7 @@ function Order(props) {
               severity="error"
               sx={{
                 borderRadius: 2,
-                backgroundColor: "#f44336", // Red for error alert
+                backgroundColor: "#f44336",
                 color: "#ffffff",
               }}
             >
