@@ -72,7 +72,20 @@ function Order(props) {
   if (!props.order) return null;
 
   return (
-    <Box sx={{ p: 4, maxWidth: 800, margin: "auto" }}>
+    <Box
+      sx={{
+        p: 0,
+        maxWidth: 800,
+        left: 0,
+        right: 0,
+        margin: "auto",
+        position: "absolute", // Change to absolute for centering
+        top: "50%", // Center vertically
+        left: "30%", // Center horizontally
+
+        transform: "translate(-10%, -50%)", // Offset for true center
+      }}
+    >
       <Card
         sx={{
           boxShadow: 3,
