@@ -35,6 +35,7 @@ const Receipt = ({ order }) => {
     orderAmount,
     currencySymbol,
     items,
+    orderId,
   } = order;
 
   // Calculate subtotal (total cost of items)
@@ -109,6 +110,9 @@ const Receipt = ({ order }) => {
           sx={{ color: "#333", textAlign: "center", marginBottom: 2 }}
         >
           Heart Attack
+        </Typography>
+        <Typography variant="h5" style={{ color: "#000" }}>
+          order id : {orderId}
         </Typography>
 
         {/* Contact Info */}
