@@ -43,7 +43,7 @@ const Orders = () => {
     <>
       <Header />
       {/* Page content */}
-      <OrderComponent order={order} />
+      {/*  <OrderComponent order={order} /> */}
       <Container className={globalClasses.flex} fluid>
         {errorQuery && (
           <tr>

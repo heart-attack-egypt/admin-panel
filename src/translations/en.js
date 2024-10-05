@@ -35,6 +35,7 @@ const en = {
     'Secret Key': 'Secret Key',
     'Delivery Charges': 'Delivery Charges',
     Price: 'Price',
+    printOrder: 'Print Order',
     'Add Food': 'Add Food',
     Category: 'Category',
     Select: 'Select',

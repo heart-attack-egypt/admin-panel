@@ -1,19 +1,16 @@
-/* eslint-disable react/display-name */
 import React, { useEffect, useState, useRef } from "react";
 import { withTranslation } from "react-i18next";
 import { transformToNewline } from "../../utils/stringManipulations";
 import DataTable from "react-data-table-component";
-import orderBy from "lodash/orderBy";
 import CustomLoader from "../Loader/CustomLoader";
 import { subscribePlaceOrder, orderCount } from "../../apollo";
 import { useQuery, gql } from "@apollo/client";
 import SearchBar from "../TableHeader/SearchBar";
-import { customStyles } from "../../utils/tableCustomStyles";
 import TableHeader from "../TableHeader";
-import { Button, useTheme } from "@mui/material";
+import { Button, useTheme, Chip, Box } from "@mui/material";
 import ReactToPrint, { useReactToPrint } from "react-to-print";
+import PrintIcon from "@mui/icons-material/Print";
 import { FormatReceipt } from "./format";
-import Order from "./Order";
 
 const ORDERCOUNT = gql`
   ${orderCount}
@@ -31,10 +28,8 @@ const OrdersData = (props) => {
   const onChangeSearch = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-
-    // Call the setSearchQuery passed from the parent component
     if (value.length >= 3 || value.length === 0) {
-      props.setSearchQuery(value); // Trigger search query when length is greater than 2
+      props.setSearchQuery(value);
       props.page(1);
     }
   };
@@ -49,6 +44,7 @@ const OrdersData = (props) => {
       )
       .join("\n");
   };
+
   const restaurantId = localStorage.getItem("restaurantId");
 
   const { data, loading: loadingQuery } = useQuery(ORDERCOUNT, {
@@ -64,54 +60,85 @@ const OrdersData = (props) => {
     props.page(page);
   };
 
+  // Function to render status label with appropriate colors
+  const renderStatusLabel = (status) => {
+    let color = "default";
+    switch (status) {
+      case "PENDING":
+        color = "#FFCC80"; // Light Orange for Processing
+        break;
+      case "ACCEPTED":
+        color = "#64B5F6"; // Light Blue for Waiting
+        break;
+      case "DELIVERED":
+        color = "#81C784"; // Soft Green for Delivered
+        break;
+      case "CANCELLED":
+        color = "#E0E0E0"; // Light Gray for Cancelled
+        break;
+      default:
+        color = "#E0E0E0"; // Default Light Gray
+    }
+    return (
+      <Chip
+        label={status}
+        style={{ backgroundColor: color, color: "#000", fontWeight: "bold" }}
+      />
+    );
+  };
+
   const columns = [
     {
       name: t("OrderID"),
       sortable: true,
+      style: { fontWeight: "bold" },
       selector: "orderId",
+      center: true, // Center column content
     },
     {
       name: t("Items"),
       cell: (row) => <>{getItems(row.items)}</>,
+      center: true,
     },
     {
       name: t("Payment"),
       selector: "paymentMethod",
       sortable: true,
+      center: true,
     },
     {
       name: t("Status"),
-      selector: "orderStatus",
-      sortable: true,
+      cell: (row) => renderStatusLabel(row.orderStatus),
+      center: true,
     },
     {
       name: t("Datetime"),
-      cell: (row) => (
-        <>{new Date(row.createdAt).toLocaleString().replace(/ /g, "\n")}</>
-      ),
+      cell: (row) => <>{new Date(row.createdAt).toLocaleString()}</>,
+      center: true,
     },
     {
       name: t("Address"),
       cell: (row) => (
         <>{transformToNewline(row.deliveryAddress.deliveryAddress, 3)}</>
       ),
+      center: true,
     },
     {
-      name: t("name"),
+      name: t("Name"),
       cell: (row) => <>{transformToNewline(row.user?.name ?? "", 3)}</>,
+      center: true,
     },
     {
-      name: t("phone"),
+      name: t("Phone"),
       cell: (row) => <>{transformToNewline(row.user?.phone ?? "", 3)}</>,
+      center: true,
     },
     {
-      name: t("print order"),
+      name: t("printOrder"),
       ignoreRowClick: true,
       allowOverflow: true,
       button: true,
-
       cell: (row) => {
-        if (!row) return;
         const componentRef = useRef();
         const handlePrint = useReactToPrint({
           content: () => componentRef.current,
@@ -120,12 +147,13 @@ const OrdersData = (props) => {
         return (
           <>
             <Button
-              style={{ color: "#000" }}
+              variant="contained"
+              color="primary"
               size="small"
-              variant="outlined"
               onClick={handlePrint}
+              startIcon={<PrintIcon />}
             >
-              <strong>print order</strong>
+              Print
             </Button>
 
             <div style={{ display: "none" }}>
@@ -134,18 +162,61 @@ const OrdersData = (props) => {
           </>
         );
       },
+      center: true,
     },
   ];
 
+  // Custom styles for DataTable
+  const customTableStyles = {
+    headCells: {
+      style: {
+        fontSize: "16px",
+        fontWeight: "bold",
+
+        justifyContent: "center", // Center align header content
+        textAlign: "center",
+        backgroundColor: theme.palette.background.default,
+        padding: "10px",
+      },
+    },
+    cells: {
+      style: {
+        justifyContent: "center", // Center align cell content
+        textAlign: "center",
+
+        padding: "8px",
+      },
+    },
+  };
+
+  // Conditional row styles based on order status
   const conditionalRowStyles = [
     {
-      when: (row) =>
-        row.orderStatus !== "DELIVERED" && row.orderStatus !== "CANCELLED",
+      when: (row) => row.orderStatus === "DELIVERED",
       style: {
-        backgroundColor: theme.palette.warning.lightest,
+        backgroundColor: "#E8F5E9", // Very light green for delivered
+      },
+    },
+    {
+      when: (row) => row.orderStatus === "PENDING",
+      style: {
+        backgroundColor: "#FFF3E0", // Very light orange for processing
+      },
+    },
+    {
+      when: (row) => row.orderStatus === "ACCEPTED",
+      style: {
+        backgroundColor: "#E3F2FD", // Very light blue for waiting
+      },
+    },
+    {
+      when: (row) => row.orderStatus === "CANCELLED",
+      style: {
+        backgroundColor: "#F5F5F5", // Very light gray for cancelled
       },
     },
   ];
+
   useEffect(() => {
     const unsubscribe = props.subscribeToMore({
       document: ORDER_PLACED,
@@ -154,20 +225,16 @@ const OrdersData = (props) => {
         if (!subscriptionData.data) return prev;
 
         const newOrder = subscriptionData.data.subscribePlaceOrder.order;
-
         if (subscriptionData.data.subscribePlaceOrder.origin === "new") {
-          // If it's a new order, prepend it to the list immutably
           return {
-            ...prev, // Spread prev to maintain other parts of the state
+            ...prev,
             ordersByRestId: [newOrder, ...prev.ordersByRestId],
           };
         } else {
-          // If it's an update to an existing order, find and update it immutably
           const orderIndex = prev.ordersByRestId.findIndex(
             (o) => o._id === newOrder._id
           );
 
-          // If the order is found, update it
           if (orderIndex > -1) {
             const updatedOrders = [
               ...prev.ordersByRestId.slice(0, orderIndex),
@@ -176,12 +243,10 @@ const OrdersData = (props) => {
             ];
 
             return {
-              ...prev, // Spread prev to maintain other parts of the state
+              ...prev,
               ordersByRestId: updatedOrders,
             };
           }
-
-          // If the order is not found, return the previous state
           return prev;
         }
       },
@@ -189,10 +254,9 @@ const OrdersData = (props) => {
         console.error("Subscription error:", error);
       },
     });
-
-    // Unsubscribe when component unmounts
     return () => unsubscribe();
   }, [restaurantId, props]);
+
   useEffect(() => {
     if (selected) {
       const order = props.orders.find((o) => o._id === selected._id);
@@ -205,10 +269,12 @@ const OrdersData = (props) => {
       <DataTable
         title={<TableHeader title={t("Orders")} />}
         columns={columns}
+        dense
         data={props.orders || []}
         onRowClicked={props.toggleModal}
         progressPending={props.loading || loadingQuery}
         pointerOnHover
+        highlightOnHover
         progressComponent={<CustomLoader />}
         subHeader
         subHeaderComponent={
@@ -220,12 +286,11 @@ const OrdersData = (props) => {
         onChangeRowsPerPage={handlePerRowsChange}
         onChangePage={handlePageChange}
         conditionalRowStyles={conditionalRowStyles}
-        customStyles={customStyles}
+        customStyles={customTableStyles} // Apply custom styles
         selectableRows
-        paginationIconLastPage=""
-        paginationIconFirstPage=""
       />
     </>
   );
 };
+
 export default withTranslation()(OrdersData);
