@@ -186,15 +186,7 @@ function Order(props) {
             ))}
             {order.instructions && (
               <>
-                <Box
-                  sx={{
-                    mb: 2,
-                    p: 2,
-                    borderRadius: 2,
-                    backgroundColor: "#3e3e3e",
-                    color: "#ffffff",
-                  }}
-                >
+                <Box sx={{ mb: 3 }}>
                   <Typography
                     variant="h6"
                     sx={{
@@ -205,11 +197,21 @@ function Order(props) {
                   >
                     {t("Note")}
                   </Typography>
-                  <Grid lg={7}>
-                    <Typography variant="body1">
-                      {`comment : ${order.instructions}`}
-                    </Typography>
-                  </Grid>
+                  <Box
+                    sx={{
+                      mb: 2,
+                      p: 2,
+                      borderRadius: 2,
+                      backgroundColor: "#3e3e3e",
+                      color: "#ffffff",
+                    }}
+                  >
+                    <Grid lg={7}>
+                      <Typography variant="body1">
+                        {`comment : ${order.instructions}`}
+                      </Typography>
+                    </Grid>
+                  </Box>
                 </Box>
               </>
             )}
