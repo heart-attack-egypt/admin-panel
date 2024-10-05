@@ -16,6 +16,7 @@ const ar = {
     Loading: 'جار التحميل',
     Error: 'خطأ',
     Edit: 'تحرير',
+    printOrder: 'طباعة الطلب',
     Delete: 'حذف',
     'Edit Category': 'تحرير الفئة',
     Save: 'حفظ',

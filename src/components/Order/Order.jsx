@@ -13,11 +13,14 @@ import {
   Input,
   Button,
   useTheme,
+  Card,
+  CardContent,
+  CardActions,
 } from "@mui/material";
+import { CheckCircle, Cancel } from "@mui/icons-material";
 import useStyles from "./styles";
 import useGlobalStyles from "../../utils/globalStyles";
 
-// constants
 const UPDATE_STATUS = gql`
   ${updateOrderStatus}
 `;
@@ -40,10 +43,12 @@ function Order(props) {
     }
     setTimeout(onDismiss, 5000);
   };
+
   const onError = (error) => {
     errorSetter(error.message);
     setTimeout(onDismiss, 5000);
   };
+
   const { data } = useQuery(GET_CONFIGURATION);
   const [mutate, { loading }] = useMutation(UPDATE_STATUS, {
     onError,
@@ -63,236 +68,269 @@ function Order(props) {
 
   const classes = useStyles();
   const globalClasses = useGlobalStyles();
+
   if (!props.order) return null;
+
   return (
-    <Box className={[classes.container, classes.pb]}>
-      <Box className={classes.flexRow}>
-        <Box item className={classes.heading}>
-          <Typography variant="h6" className={classes.text}>
-            {t("Order")} # {order.orderId}
-          </Typography>
-        </Box>
-      </Box>
-      <Box className={[classes.container, classes.bgPrimary]}>
-        <Typography className={classes.itemHeader} variant="h6">
-          {t("Items")}
-        </Typography>
-        <Box container className={classes.innerContainer}>
-          {order &&
-            order.items.map((item) => (
-              <>
-                <Grid container mb={1} mt={1}>
+    <Box sx={{ p: 4, maxWidth: 800, margin: "auto" }}>
+      <Card
+        sx={{
+          boxShadow: 3,
+          borderRadius: 3,
+
+          overflow: "hidden",
+          backgroundColor: "#2e2e2e", // Dark background for contrast
+        }}
+      >
+        <CardContent>
+          {/* Order Header */}
+          <Box sx={{ mb: 2 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+                color: "#ffcc00", // Gold-like color for restaurant vibe
+                borderBottom: `2px solid #ff5733`, // Vibrant red-orange for accents
+                pb: 1,
+              }}
+            >
+              {t("Order")} #{order.orderId}
+            </Typography>
+          </Box>
+
+          {/* Items Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                mb: 2,
+                fontWeight: "bold",
+                color: "#ffcc00", // Gold color for section headers
+              }}
+            >
+              {t("Items")}
+            </Typography>
+            {order.items.map((item, index) => (
+              <Box
+                key={index}
+                sx={{
+                  mb: 2,
+                  p: 2,
+                  borderRadius: 2,
+                  backgroundColor: "#3e3e3e", // Dark gray background for item sections
+                  color: "#ffffff", // White text for visibility
+                }}
+              >
+                <Grid container alignItems="center" spacing={2}>
                   <Grid item lg={1}>
                     <Typography
-                      className={[classes.quantity, classes.textBlack]}
-                      variant="p"
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#ffcc00", // Gold for quantity
+                      }}
                     >
                       {item.quantity}
                     </Typography>
                   </Grid>
-                  <Grid className={classes.textBlack} item lg={9}>
-                    {`${item.title}${
-                      item.variation.title ? `(${item.variation.title})` : ""
-                    }`}
+                  <Grid item lg={7}>
+                    <Typography variant="body1">
+                      {`${item.title}${
+                        item.variation.title ? ` (${item.variation.title})` : ""
+                      }`}
+                    </Typography>
                   </Grid>
-                  <Grid
-                    className={[classes.price, classes.textPrimary]}
-                    item
-                    lg={2}
-                  >
-                    {data && data.configuration.currencySymbol}{" "}
-                    {(item.variation.price * item.quantity).toFixed(2)}
+                  <Grid item lg={2}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#ff5733", // Red-orange for prices
+                      }}
+                    >
+                      {data.configuration.currencySymbol}{" "}
+                      {(item.variation.price * item.quantity).toFixed(2)}
+                    </Typography>
                   </Grid>
                 </Grid>
                 {item.specialInstructions.length > 0 && (
-                  <Typography variant="text" className={classes.textBlack}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#ffc107", // Bright yellow for special instructions
+                      mt: 1,
+                    }}
+                  >
                     {t("SpecialInstructions")}
                   </Typography>
                 )}
-                <Divider />
-              </>
+              </Box>
             ))}
-        </Box>
-      </Box>
-      <Box mt={3} className={[classes.container, classes.bgPrimary]}>
-        <Typography className={classes.itemHeader} variant="h6">
-          {t("Charges")}
-        </Typography>
-        <Box container className={classes.innerContainer}>
-          <Grid container mb={1} mt={1}>
-            <Grid className={classes.textBlack} item lg={10}>
-              {t("Subtotal")}
-            </Grid>
-            <Grid className={[classes.textBlack]} item lg={2}>
-              {data && data.configuration.currencySymbol}{" "}
-              {(
-                order.orderAmount -
-                order.deliveryCharges -
-                order.tipping -
-                order.taxationAmount
-              ).toFixed(2)}
-            </Grid>
-          </Grid>
-          <Divider />
-          <Grid container mb={1} mt={1}>
-            <Grid className={classes.textBlack} item lg={10}>
-              {t("DeliveryFee")}
-            </Grid>
-            <Grid className={[classes.textBlack]} item lg={2}>
-              {data && data.configuration.currencySymbol}{" "}
-              {order && order.deliveryCharges.toFixed(2)}
-            </Grid>
-          </Grid>
-          <Divider />
-          <Grid container mb={1} mt={1}>
-            <Grid className={classes.textBlack} item lg={10}>
-              {t("TaxCharges")}
-            </Grid>
-            <Grid className={[classes.textBlack]} item lg={2}>
-              {data && data.configuration.currencySymbol}{" "}
-              {order && order.taxationAmount.toFixed(2)}
-            </Grid>
-          </Grid>
-          <Divider />
-          <Grid container mb={1} mt={1}>
-            <Grid className={classes.textBlack} item lg={10}>
-              {t("Tip")}
-            </Grid>
-            <Grid className={[classes.textBlack]} item lg={2}>
-              {data && data.configuration.currencySymbol}{" "}
-              {order && order.tipping.toFixed(2)}
-            </Grid>
-          </Grid>
-          <Divider />
-          <Grid container mb={1} mt={5}>
-            <Grid className={classes.textBlack} item lg={10}>
-              {t("Total")}
-            </Grid>
-            <Grid className={[classes.textBlack]} item lg={2}>
-              {data && data.configuration.currencySymbol}{" "}
-              {order && order.orderAmount.toFixed(2)}
-            </Grid>
-          </Grid>
-          <Divider />
-        </Box>
-      </Box>
-      <Box mb={3} className={[classes.container, classes.bgPrimary]}>
-        <Typography className={classes.itemHeader} variant="h6">
-          {t("PaymentMethod")}
-        </Typography>
-        <Box container className={classes.innerContainer}>
-          <Grid container mb={1} mt={1}>
-            <Grid item lg={3} />
-            <Grid
-              className={[classes.price, classes.textPrimary, classes.pd]}
-              item
-              lg={6}
-            >
-              {order.paymentMethod}
-            </Grid>
-            <Grid item lg={3} />
-          </Grid>
-          <Divider />
-          <Grid container mb={1} mt={2}>
-            <Grid item lg={10}>
-              <Typography className={[classes.textBlack]} variant="p">
-                {t("PaidAmount")}
-              </Typography>
-            </Grid>
-            <Grid className={[classes.price, classes.textPrimary]} item lg={2}>
-              {data && data.configuration.currencySymbol}{" "}
-              {order && order.paidAmount ? order.paidAmount.toFixed(2) : 0}
-            </Grid>
-          </Grid>
-        </Box>
-      </Box>
-      {order.orderStatus !== "CANCELLED" && order.orderStatus !== "DELIVERED" && (
-        <>
-          {loading && (
-            <Loader
-              className="text-center"
-              type="TailSpin"
-              color={theme.palette.error.lightest}
-              height={40}
-              width={40}
-              visible={loading}
-            />
-          )}
-          <Box className={classes.btnBox}>
-            <Button
-              className={globalClasses.button}
-              disabled={
-                order.orderStatus !== "CANCELLED" &&
-                order.orderStatus !== "PENDING"
-              }
-              onClick={() => {
-                mutate({
-                  variables: {
-                    id: order._id,
-                    status: "ACCEPTED",
-                    reason: "",
-                  },
-                });
+          </Box>
+
+          {/* Payment Method Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                mb: 2,
+                fontWeight: "bold",
+                color: "#ffcc00", // Gold color for section headers
               }}
             >
-              {order && order.status === true ? t("Accepted") : t("Accept")}
-            </Button>
-            <Button
-              variant="outlined"
-              color="error"
-              className={globalClasses.button}
-              disabled={order.orderStatus === "CANCELLED"}
-              onClick={() => {
-                if (validateReason()) {
+              {t("PaymentMethod")}
+            </Typography>
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                backgroundColor: "#3e3e3e", // Dark gray for payment section
+              }}
+            >
+              <Grid container spacing={2} alignItems="center">
+                <Grid item lg={6} sx={{ textAlign: "center" }}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#ffcc00", // Gold for payment method text
+                    }}
+                  >
+                    {order.paymentMethod}
+                  </Typography>
+                </Grid>
+                <Grid item lg={6}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#ff5733", // Red-orange for payment amount
+                    }}
+                  >
+                    {data.configuration.currencySymbol}{" "}
+                    {order.paidAmount ? order.paidAmount.toFixed(2) : 0}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
+        </CardContent>
+
+        {/* Action Buttons */}
+        {order.orderStatus !== "CANCELLED" &&
+          order.orderStatus !== "DELIVERED" && (
+            <CardActions
+              sx={{
+                justifyContent: "space-between",
+                p: 3,
+                backgroundColor: "#2e2e2e", // Dark background for action section
+              }}
+            >
+              {loading && (
+                <Loader
+                  className="text-center"
+                  type="TailSpin"
+                  color="#ff5733" // Vibrant color for loading spinner
+                  height={40}
+                  width={40}
+                  visible={loading}
+                />
+              )}
+              <Button
+                startIcon={<CheckCircle />}
+                disabled={order.orderStatus !== "PENDING"}
+                onClick={() =>
                   mutate({
                     variables: {
                       id: order._id,
-                      status: "CANCELLED",
-                      reason: order.reason,
+                      status: "ACCEPTED",
+                      reason: "",
                     },
-                  });
+                  })
                 }
+                sx={{
+                  borderRadius: 3,
+                  boxShadow: 2,
+                  backgroundColor: "#4caf50", // Green for accept button
+                  "&:hover": { backgroundColor: "#388e3c" },
+                  color: "#ffffff", // White text for contrast
+                }}
+              >
+                {order.status === true ? t("Accepted") : t("Accept")}
+              </Button>
+              <Button
+                startIcon={<Cancel />}
+                disabled={order.orderStatus === "CANCELLED"}
+                onClick={() => {
+                  if (validateReason()) {
+                    mutate({
+                      variables: { id: order._id, status: "CANCELLED", reason },
+                    });
+                  }
+                }}
+                sx={{
+                  borderRadius: 3,
+                  boxShadow: 2,
+                  backgroundColor: "#f44336", // Red for cancel button
+                  "&:hover": { backgroundColor: "#d32f2f" },
+                  color: "#ffffff", // White text for contrast
+                }}
+              >
+                {order.status === false ? t("Cancelled") : t("Cancel")}
+              </Button>
+              <Input
+                name="reason"
+                id="input-reason"
+                placeholder={t("PHReasonIfRejected")}
+                type="text"
+                disableUnderline
+                value={reason}
+                onChange={(event) => reasonSetter(event.target.value)}
+                sx={{
+                  mx: 2,
+                  borderRadius: 2,
+                  borderColor: reasonError ? "error.main" : "#ffc107", // Bright yellow border on input
+                  px: 1,
+                  backgroundColor: "#424242", // Darker gray for input field
+                  color: "#ffffff", // White text
+                  border: "1px solid",
+                }}
+              />
+            </CardActions>
+          )}
+
+        {/* Alerts */}
+        <Box mt={2}>
+          {success && (
+            <Alert
+              variant="filled"
+              severity="success"
+              sx={{
+                borderRadius: 2,
+                backgroundColor: "#4caf50", // Green for success alert
+                color: "#ffffff",
               }}
             >
-              {order.status === false ? t("Cancelled") : t("Cancel")}
-            </Button>
-            <Input
-              name="reason"
-              id="input-reason"
-              placeholder={t("PHReasonIfRejected")}
-              type="text"
-              disableUnderline
-              value={(order && order.reason) || reason}
-              onChange={(event) => {
-                reasonSetter(event.target.value);
+              {success}
+            </Alert>
+          )}
+          {error && (
+            <Alert
+              variant="filled"
+              severity="error"
+              sx={{
+                borderRadius: 2,
+                backgroundColor: "#f44336", // Red for error alert
+                color: "#ffffff",
               }}
-              className={[globalClasses.input, classes.inputLength]}
-            />
-          </Box>
-          {reasonError ? null : null}
-        </>
-      )}
-      <Box mt={2}>
-        {success && (
-          <Alert
-            className={globalClasses.alertSuccess}
-            variant="filled"
-            severity="success"
-          >
-            {success}
-          </Alert>
-        )}
-        {error && (
-          <Alert
-            className={globalClasses.alertError}
-            variant="filled"
-            severity="error"
-          >
-            {error}
-          </Alert>
-        )}
-      </Box>
+            >
+              {error}
+            </Alert>
+          )}
+        </Box>
+      </Card>
     </Box>
   );
 }
+
 export default withTranslation()(Order);
