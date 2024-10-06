@@ -39,7 +39,7 @@ const Receipt = ({ order }) => {
     instructions,
     restaurant,
   } = order;
-  console.log(order);
+ 
   // Calculate subtotal (total cost of items)
   const subtotal = items.reduce((acc, item) => {
     return acc + item.variation.price * item.quantity;
