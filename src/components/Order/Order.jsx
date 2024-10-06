@@ -113,17 +113,36 @@ function Order(props) {
       >
         <CardContent>
           {/* Order Header */}
-          <Box sx={{ mb: 2 }}>
+          <Box
+            sx={{
+              mb: 2,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <Typography
               variant="h5"
               sx={{
                 fontWeight: "bold",
                 color: "#ffcc00",
-                borderBottom: `2px solid #ff5733`,
+                borderBottom: "2px solid #ff5733",
                 pb: 1,
               }}
             >
               {t("Order")} #{order.orderId}
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: "bold",
+                color: "#ffcc00",
+                borderBottom: "2px solid #ff5733",
+                pb: 1,
+              }}
+            >
+              {order.restaurant.name.replace("Heart Attack", "")} branch
             </Typography>
           </Box>
 
@@ -231,6 +250,22 @@ function Order(props) {
             </Typography>
             <Box sx={{ p: 2, backgroundColor: "#3e3e3e", borderRadius: 2 }}>
               <Grid container spacing={2}>
+                <Grid item lg={6}>
+                  <Typography variant="body1" sx={{ color: "#ffffff" }}>
+                    {t("Payment Method")}
+                  </Typography>
+                </Grid>
+                <Grid item lg={6}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#ffcc00",
+                    }}
+                  >
+                    {order.paymentMethod}
+                  </Typography>
+                </Grid>
                 <Grid item lg={6}>
                   <Typography variant="body1" sx={{ color: "#ffffff" }}>
                     {t("Subtotal")}

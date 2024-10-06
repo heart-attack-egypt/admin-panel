@@ -93,13 +93,13 @@ const AllOrdersData = (props) => {
         titleColor = "#FFFFFF"; // White for comfortable contrast
         break;
       default:
-        backgroundColor = "#E0E0E0"; // Default Light Gray
-        titleColor = "#000"; // Black for text
+        backgroundColor = "white"; // Default Light Gray
+        titleColor = "black"; // Black for text
     }
 
     return (
       <Chip
-        label={status}
+        label={status.replace("Heart Attack", " ")}
         style={{
           backgroundColor: backgroundColor,
           color: titleColor,
@@ -123,16 +123,19 @@ const AllOrdersData = (props) => {
       center: true, // Center column content
     },
     {
+      name: t("restaurant"),
+
+      style: { fontWeight: "bold" },
+      selector: "restaurant.name",
+      cell: (row) => renderStatusLabel(row.restaurant.name),
+      center: true, // Center column content
+    },
+    {
       name: t("Items"),
       cell: (row) => <>{getItems(row.items)}</>,
       center: true,
     },
-    {
-      name: t("Payment"),
-      selector: "paymentMethod",
-      sortable: true,
-      center: true,
-    },
+
     {
       name: t("Status"),
       cell: (row) => renderStatusLabel(row.orderStatus),
