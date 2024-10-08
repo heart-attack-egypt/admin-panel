@@ -49,7 +49,7 @@ function Order(props) {
   const [error, errorSetter] = useState("");
   const [success, successSetter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(
-    props?.order.orderStatus
+    props?.order?.orderStatus
   ); // Local state to track the selected status
   const [newRestaurantId, setNewRestaurantId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -80,9 +80,9 @@ function Order(props) {
   const handleRestaurantChange = () => {
     changeRestaurant({
       variables: {
-        orderId: props.order._id,
+        orderId: props.order?._id,
         newRestaurantId,
-        oldRestaurantId: props.order.restaurant._id,
+        oldRestaurantId: props.order?.restaurant._id,
       },
     });
   };
@@ -104,6 +104,9 @@ function Order(props) {
     onError,
     onCompleted,
   });
+  const vendor = localStorage.getItem("user-enatega")
+    ? JSON.parse(localStorage.getItem("user-enatega")).userType === "VENDOR"
+    : false;
 
   const validateReason = () => {
     const reasonError = !validateFunc({ reason }, "reason");
@@ -122,7 +125,7 @@ function Order(props) {
   if (!props.order) return null;
 
   // Calculate order summary values
-  const subtotal = order.items.reduce((acc, item) => {
+  const subtotal = order?.items.reduce((acc, item) => {
     return acc + item.variation.price * item.quantity;
   }, 0); // Subtotal
 
@@ -489,11 +492,13 @@ function Order(props) {
               </MenuItem>
 
               {/* Search results */}
-              {filteredRestaurants?.searchRestaurants.map((restaurant) => (
-                <MenuItem key={restaurant._id} value={restaurant._id}>
-                  {restaurant.name}
-                </MenuItem>
-              ))}
+              {filteredRestaurants?.searchRestaurants
+                .filter((rest) => rest._id !== order.restaurant._id)
+                .map((restaurant) => (
+                  <MenuItem key={restaurant._id} value={restaurant._id}>
+                    {restaurant.name}
+                  </MenuItem>
+                ))}
             </Select>
 
             {/* Change Button */}
@@ -558,7 +563,9 @@ function Order(props) {
                 <MenuItem value="PENDING">{t("Pending")}</MenuItem>
                 <MenuItem value="ACCEPTED">{t("Accepted")}</MenuItem>
                 <MenuItem value="DELIVERED">{t("Delivered")}</MenuItem>
-                <MenuItem value="CANCELLED">{t("Cancelled")}</MenuItem>
+                {vendor && (
+                  <MenuItem value="CANCELLED">{t("Cancelled")}</MenuItem>
+                )}
               </Select>
             </FormControl>
 
@@ -605,7 +612,7 @@ function Order(props) {
                 color: "#ffffff",
                 width: "100%",
               }}
-              disabled={selectedStatus === props?.order.orderStatus}
+              disabled={selectedStatus === props?.order?.orderStatus}
             >
               {t("Apply")}
             </Button>
