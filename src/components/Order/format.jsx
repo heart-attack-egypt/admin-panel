@@ -36,8 +36,10 @@ const Receipt = ({ order }) => {
     currencySymbol,
     items,
     orderId,
+    instructions,
+    restaurant,
   } = order;
-
+ 
   // Calculate subtotal (total cost of items)
   const subtotal = items.reduce((acc, item) => {
     return acc + item.variation.price * item.quantity;
@@ -102,21 +104,27 @@ const Receipt = ({ order }) => {
   };
 
   return (
-    <Box sx={{ padding: 4, backgroundColor: "#f4f4f4" }}>
-      <Paper elevation={3} sx={{ padding: 3 }}>
+    <Box sx={{ padding: 2, backgroundColor: "#f4f4f4" }}>
+      <Paper elevation={3} sx={{ padding: 2 }}>
         {/* Company Info */}
+        <Typography
+          fontSize={6}
+          sx={{ color: "#333", textAlign: "right", marginBottom: 2 }}
+        >
+          {`${restaurant.name} Branch`}
+        </Typography>
         <Typography
           variant="h4"
           sx={{ color: "#333", textAlign: "center", marginBottom: 2 }}
         >
-          Heart Attack
+          Heart Attack Receipt
         </Typography>
         <Typography variant="h5" style={{ color: "#000" }}>
           order id : {orderId}
         </Typography>
 
         {/* Contact Info */}
-        <Box sx={{ marginBottom: 3 }}>
+        <Box sx={{ marginBottom: 1 }}>
           <Typography variant="h6" sx={{ color: "#555" }}>
             Contact Info
           </Typography>
@@ -128,11 +136,21 @@ const Receipt = ({ order }) => {
             Phone: {phone}
           </Typography>
         </Box>
-
+        {/* Instructions */}
+        {instructions && (
+          <Box sx={{ marginBottom: 1 }}>
+            <Typography variant="h6" sx={{ color: "#555" }}>
+              Special Instructions
+            </Typography>
+            <Typography variant="body1" sx={{ color: "#333", marginTop: 1 }}>
+              {instructions}
+            </Typography>
+          </Box>
+        )}
         <Divider sx={{ marginY: 2 }} />
 
         {/* Order Items Table */}
-        <TableContainer component={Paper} sx={{ marginY: 2 }}>
+        <TableContainer component={Paper} sx={{ marginY: 1 }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -157,7 +175,7 @@ const Receipt = ({ order }) => {
           </Table>
         </TableContainer>
 
-        <Divider sx={{ marginY: 2 }} />
+        <Divider sx={{ marginY: 1 }} />
 
         {/* Summary */}
         <Grid container spacing={2} justifyContent="flex-end">

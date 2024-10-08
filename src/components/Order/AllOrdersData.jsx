@@ -48,7 +48,7 @@ const AllOrdersData = (props) => {
   const { data, loading: loadingQuery } = useQuery(ORDERCOUNT, {
     variables: { search: searchQuery },
   });
- 
+
   const propExists = (obj, path) => {
     return path.split(".").reduce((obj, prop) => {
       return obj && obj[prop] ? obj[prop] : "";
@@ -72,30 +72,44 @@ const AllOrdersData = (props) => {
     props.rows(perPage);
   };
   const renderStatusLabel = (status) => {
-    let color = "default";
+    let backgroundColor = "#E0E0E0"; // Default Light Gray
+    let titleColor = "#000"; // Default Black for title text
+
     switch (status) {
       case "PENDING":
-        color = "#FFCC80"; // Light Orange for Processing
+        backgroundColor = "#FFCC80"; // Light Orange for Processing
+        titleColor = "#5C4033"; // Dark Brown for comfortable contrast
         break;
       case "ACCEPTED":
-        color = "#64B5F6"; // Light Blue for Waiting
+        backgroundColor = "#64B5F6"; // Light Blue for Waiting
+        titleColor = "#0D47A1"; // Dark Blue for comfortable contrast
         break;
       case "DELIVERED":
-        color = "#81C784"; // Soft Green for Delivered
+        backgroundColor = "#81C784"; // Soft Green for Delivered
+        titleColor = "#1B5E20"; // Dark Green for comfortable contrast
         break;
       case "CANCELLED":
-        color = "#E0E0E0"; // Light Gray for Cancelled
+        backgroundColor = "#f54d4d"; // Red for Cancelled
+        titleColor = "#FFFFFF"; // White for comfortable contrast
         break;
       default:
-        color = "#E0E0E0"; // Default Light Gray
+        backgroundColor = "#E0E0E0"; // Default Light Gray
+        titleColor = "#000"; // Black for text
     }
+
     return (
       <Chip
         label={status}
-        style={{ backgroundColor: color, color: "#000", fontWeight: "bold" }}
+        style={{
+          backgroundColor: backgroundColor,
+          color: titleColor,
+          fontWeight: "bold",
+          boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+        }}
       />
     );
   };
+
   const handlePageChange = async (page) => {
     props.page(page);
   };
@@ -122,6 +136,7 @@ const AllOrdersData = (props) => {
     {
       name: t("Status"),
       cell: (row) => renderStatusLabel(row.orderStatus),
+
       center: true,
     },
     {
@@ -201,7 +216,7 @@ const AllOrdersData = (props) => {
     {
       when: (row) => row.orderStatus === "CANCELLED",
       style: {
-        backgroundColor: "#F5F5F5", // Very light gray for cancelled
+        backgroundColor: "#f8dfdf", // Very light gray for cancelled
       },
     },
   ];
