@@ -569,6 +569,10 @@ function Order(props) {
             }}
           >
             {/* Order Status Dropdown */}
+            <Typography sx={{ mb: 2, color: "#ffffff" }}>
+              {t("status:")} {order.orderStatus}
+            </Typography>
+
             <FormControl
               sx={{
                 minWidth: 200,
