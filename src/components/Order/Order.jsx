@@ -589,13 +589,18 @@ function Order(props) {
               <Select
                 value={selectedStatus}
                 onChange={(event) => setSelectedStatus(event.target.value)}
-                sx={{
+                style={{
+                  marginLeft: "10px",
+                  width: "100%",
+                  backgroundColor: "#424242",
                   color: "#ffffff",
-                  ".MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#ffc107",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#ffeb3b",
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      backgroundColor: "#424242",
+                      color: "#ffffff",
+                    },
                   },
                 }}
               >
