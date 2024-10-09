@@ -602,7 +602,7 @@ function Order(props) {
                 <MenuItem value="PENDING">{t("Pending")}</MenuItem>
                 <MenuItem value="ACCEPTED">{t("Accepted")}</MenuItem>
                 <MenuItem value="DELIVERED">{t("Delivered")}</MenuItem>
-                {vendor && (
+                {!vendor && (
                   <MenuItem value="CANCELLED">{t("Cancelled")}</MenuItem>
                 )}
               </Select>
