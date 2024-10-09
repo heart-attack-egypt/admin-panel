@@ -1,3 +1,14 @@
+import { gql } from "apollo-boost";
+
+export const SEARCH_RESTAURANTS = gql`
+  query SearchRestaurants($search: String!) {
+    searchRestaurants(search: $search) {
+      _id
+      name
+    }
+  }
+`;
+
 export const getOrders = `query Orders($page:Int, $search:String){
     allOrders(page:$page, search:$search){
       _id

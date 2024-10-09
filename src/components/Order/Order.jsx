@@ -1,8 +1,21 @@
 import React, { useState } from "react";
 import { useMutation, useQuery, gql } from "@apollo/client";
+import {
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  TextField,
+} from "@mui/material";
+
 import { withTranslation } from "react-i18next";
 import { validateFunc } from "../../constraints/constraints";
-import { updateOrderStatus, getConfiguration } from "../../apollo";
+import {
+  updateOrderStatus,
+  getConfiguration,
+  CHANGE_RESTAURANT,
+  SEARCH_RESTAURANTS,
+} from "../../apollo";
 import Loader from "react-loader-spinner";
 import {
   Box,
@@ -30,11 +43,49 @@ const GET_CONFIGURATION = gql`
 
 function Order(props) {
   const theme = useTheme();
-  const { order, t } = props;
+  let { order, t } = props;
   const [reason, reasonSetter] = useState("");
   const [reasonError, reasonErrorSetter] = useState(null);
   const [error, errorSetter] = useState("");
   const [success, successSetter] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(
+    props?.order?.orderStatus
+  ); // Local state to track the selected status
+  const [newRestaurantId, setNewRestaurantId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isOpen, setIsOpen] = useState(true);
+
+  const { data: filteredRestaurants } = useQuery(SEARCH_RESTAURANTS, {
+    variables: { search: searchTerm },
+    skip: searchTerm.length < 3, // Skip query if searchTerm is empty
+  });
+
+  const [changeRestaurant, { loading: changingRestaurant }] = useMutation(
+    CHANGE_RESTAURANT,
+    {
+      onCompleted: (data) => {
+        // Update orders list after changing restaurant
+        order = data.changeRestaurant;
+        successSetter("restaurant changed");
+        setTimeout(() => onDismiss(), 1000);
+      },
+      onError: (error) => {
+        console.error("Failed to change restaurant:", error);
+        errorSetter("Failed to change restaurant");
+        setTimeout(() => onDismiss(), 1000);
+      },
+    }
+  );
+
+  const handleRestaurantChange = () => {
+    changeRestaurant({
+      variables: {
+        orderId: props.order?._id,
+        newRestaurantId,
+        oldRestaurantId: props.order?.restaurant._id,
+      },
+    });
+  };
 
   const onCompleted = ({ updateOrderStatus }) => {
     if (updateOrderStatus) {
@@ -53,6 +104,9 @@ function Order(props) {
     onError,
     onCompleted,
   });
+  const vendor = localStorage.getItem("user-enatega")
+    ? JSON.parse(localStorage.getItem("user-enatega")).userType === "VENDOR"
+    : false;
 
   const validateReason = () => {
     const reasonError = !validateFunc({ reason }, "reason");
@@ -71,7 +125,7 @@ function Order(props) {
   if (!props.order) return null;
 
   // Calculate order summary values
-  const subtotal = order.items.reduce((acc, item) => {
+  const subtotal = order?.items.reduce((acc, item) => {
     return acc + item.variation.price * item.quantity;
   }, 0); // Subtotal
 
@@ -394,89 +448,222 @@ function Order(props) {
             </Box>
           </Box>
         </CardContent>
-
         {/* Action Buttons */}
-        {order.orderStatus !== "CANCELLED" &&
-          order.orderStatus !== "DELIVERED" && (
-            <CardActions
-              sx={{
-                justifyContent: "space-between",
-                p: 3,
-                backgroundColor: "#2e2e2e",
+        <CardActions
+          sx={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            p: 3,
+            backgroundColor: "#2e2e2e",
+          }}
+        >
+          {/* Restaurant Selection Section */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "16px",
+              backgroundColor: "#2e2e2e",
+              marginRight: "16px",
+              width: "100%",
+            }}
+          >
+            <Typography sx={{ mb: 2, color: "#ffffff" }}>
+              {t("Restaurant:")} {order.restaurant.name}
+            </Typography>
+
+            {/* Search Input for Restaurant */}
+            <TextField
+              placeholder={t("Search restaurant...")}
+              variant="outlined"
+              value={searchTerm}
+              onChange={(e) => {
+                console.log("here");
+                const value = e.target.value;
+                setSearchTerm(value);
+                if (value.length >= 3) setIsOpen(true);
+                else setIsOpen(false);
+              }}
+              style={{
+                marginBottom: "10px",
+                width: "100%",
+                backgroundColor: "#424242",
+                color: "#ffffff",
+              }}
+              InputProps={{
+                style: { color: "#ffffff" },
+              }}
+            />
+
+            {/* Select Dropdown */}
+            <Select
+              open={isOpen && !!filteredRestaurants?.searchRestaurants.length}
+              value={newRestaurantId || order.restaurant._id}
+              onChange={(e) => {
+                setIsOpen(false);
+                setNewRestaurantId(e.target.value);
+              }}
+              onClick={(e) => setIsOpen(!isOpen)}
+              style={{
+                marginLeft: "10px",
+                width: "100%",
+                backgroundColor: "#424242",
+                color: "#ffffff",
+              }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    backgroundColor: "#424242",
+                    color: "#ffffff",
+                  },
+                },
               }}
             >
-              {loading && (
-                <Loader
-                  className="text-center"
-                  type="TailSpin"
-                  color="#ff5733"
-                  height={40}
-                  width={40}
-                  visible={loading}
-                />
-              )}
-              <Button
-                startIcon={<CheckCircle />}
-                disabled={order.orderStatus !== "PENDING"}
-                onClick={() =>
-                  mutate({
-                    variables: {
-                      id: order._id,
-                      status: "ACCEPTED",
-                      reason: "",
-                    },
-                  })
-                }
+              {/* Disabled option showing current restaurant */}
+              <MenuItem disabled value={order.restaurant._id}>
+                {order.restaurant.name}
+              </MenuItem>
+
+              {/* Search results */}
+              {filteredRestaurants?.searchRestaurants
+                .filter((rest) => rest._id !== order.restaurant._id)
+                .map((restaurant) => (
+                  <MenuItem key={restaurant._id} value={restaurant._id}>
+                    {restaurant.name}
+                  </MenuItem>
+                ))}
+            </Select>
+
+            {/* Change Button */}
+            <Button
+              sx={{
+                m: 3,
+                p: 2,
+                borderRadius: 3,
+                boxShadow: 2,
+                backgroundColor: "#4caf50",
+                "&:hover": { backgroundColor: "#388e3c" },
+                color: "#ffffff",
+                width: "100%",
+              }}
+              onClick={() => handleRestaurantChange(newRestaurantId)}
+              disabled={
+                changingRestaurant || newRestaurantId == order.restaurant._id
+              }
+            >
+              {t("Change")}
+            </Button>
+          </div>
+
+          {/* Order Status Section */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "16px",
+              backgroundColor: "#2e2e2e",
+              width: "100%",
+            }}
+          >
+            {/* Order Status Dropdown */}
+            <FormControl
+              sx={{
+                minWidth: 200,
+                backgroundColor: "#424242",
+                borderRadius: 2,
+                borderColor: "#ffc107",
+                mb: 2,
+                width: "100%",
+              }}
+            >
+              <InputLabel sx={{ color: "#ffffff" }}>
+                {t("Order Status")}
+              </InputLabel>
+              <Select
+                value={selectedStatus}
+                onChange={(event) => setSelectedStatus(event.target.value)}
                 sx={{
-                  borderRadius: 3,
-                  boxShadow: 2,
-                  backgroundColor: "#4caf50",
-                  "&:hover": { backgroundColor: "#388e3c" },
                   color: "#ffffff",
+                  ".MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#ffc107",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#ffeb3b",
+                  },
                 }}
               >
-                {order.status === true ? t("Accepted") : t("Accept")}
-              </Button>
-              <Button
-                startIcon={<Cancel />}
-                disabled={order.orderStatus === "CANCELLED"}
-                onClick={() => {
-                  if (validateReason()) {
-                    mutate({
-                      variables: { id: order._id, status: "CANCELLED", reason },
-                    });
-                  }
-                }}
-                sx={{
-                  borderRadius: 3,
-                  boxShadow: 2,
-                  backgroundColor: "#f44336",
-                  "&:hover": { backgroundColor: "#d32f2f" },
-                  color: "#ffffff",
-                }}
-              >
-                {order.status === false ? t("Cancelled") : t("Cancel")}
-              </Button>
-              <Input
-                name="reason"
+                <MenuItem value="PENDING">{t("Pending")}</MenuItem>
+                <MenuItem value="ACCEPTED">{t("Accepted")}</MenuItem>
+                <MenuItem value="DELIVERED">{t("Delivered")}</MenuItem>
+                {vendor && (
+                  <MenuItem value="CANCELLED">{t("Cancelled")}</MenuItem>
+                )}
+              </Select>
+            </FormControl>
+
+            {/* Reason Input for Cancelled Status */}
+            {selectedStatus === "CANCELLED" && (
+              <TextField
                 id="input-reason"
                 placeholder={t("PHReasonIfRejected")}
-                type="text"
-                disableUnderline
                 value={reason}
                 onChange={(event) => reasonSetter(event.target.value)}
+                variant="outlined"
+                fullWidth
                 sx={{
-                  mx: 2,
+                  mb: 2,
                   borderRadius: 2,
-                  borderColor: reasonError ? "error.main" : "#ffc107",
-                  px: 1,
                   backgroundColor: "#424242",
                   color: "#ffffff",
                   border: "1px solid",
+                  borderColor: reasonError ? "error.main" : "#ffc107",
                 }}
               />
-            </CardActions>
+            )}
+
+            {/* Apply Button */}
+            <Button
+              startIcon={<CheckCircle />}
+              onClick={() => {
+                if (selectedStatus === "CANCELLED" && !validateReason()) {
+                  return; // Validate reason for cancellation
+                }
+                mutate({
+                  variables: {
+                    id: order._id,
+                    status: selectedStatus,
+                    reason: selectedStatus === "CANCELLED" ? reason : "",
+                  },
+                });
+              }}
+              sx={{
+                borderRadius: 3,
+                boxShadow: 2,
+                backgroundColor: "#4caf50",
+                "&:hover": { backgroundColor: "#388e3c" },
+                color: "#ffffff",
+                width: "100%",
+              }}
+              disabled={selectedStatus === props?.order?.orderStatus}
+            >
+              {t("Apply")}
+            </Button>
+          </div>
+
+          {(loading || changingRestaurant) && (
+            <Loader
+              className="text-center"
+              type="TailSpin"
+              color="#ff5733"
+              height={40}
+              width={40}
+              visible={loading}
+            />
           )}
+        </CardActions>
 
         {/* Alerts */}
         <Box mt={2}>

@@ -1,3 +1,30 @@
+import { gql } from "apollo-boost";
+
+export const CHANGE_RESTAURANT = gql`
+  mutation ChangeRestaurant(
+    $orderId: String!
+    $newRestaurantId: String!
+    $oldRestaurantId: String!
+  ) {
+    changeRestaurant(
+      orderId: $orderId
+      newRestaurantId: $newRestaurantId
+      oldRestaurantId: $oldRestaurantId
+    ) {
+      _id
+      restaurant {
+        _id
+        name
+      }
+      user {
+        _id
+        name
+        phone
+      }
+    }
+  }
+`;
+
 export const createFood = `
   mutation CreateFood($foodInput:FoodInput!){
       createFood(
@@ -25,7 +52,7 @@ export const createFood = `
         updatedAt
       }
       }
-    }`
+    }`;
 
 export const editFood = `
     mutation EditFood($foodInput:FoodInput!){
@@ -54,7 +81,7 @@ export const editFood = `
               updatedAt
             }
         }
-      }`
+      }`;
 
 export const deleteFood = `
       mutation DeleteFood($id:String!,$restaurant:String!,$categoryId:String!){
@@ -81,7 +108,7 @@ export const deleteFood = `
             updatedAt
           }
         }
-      }`
+      }`;
 
 export const createCategory = `
 mutation CreateCategory($category:CategoryInput){
@@ -110,7 +137,7 @@ mutation CreateCategory($category:CategoryInput){
       updatedAt
     }
   }
-}`
+}`;
 
 export const editCategory = `
       mutation EditCategory($category:CategoryInput){
@@ -139,7 +166,7 @@ export const editCategory = `
             updatedAt
           }
         }
-      }`
+      }`;
 
 export const deleteCategory = `
       mutation DeleteCategory($id:String!,$restaurant:String!){
@@ -168,7 +195,7 @@ export const deleteCategory = `
                   updatedAt
                 }
         }
-      }`
+      }`;
 
 export const saveEmailConfiguration = `mutation SaveEmailConfiguration($configurationInput:EmailConfigurationInput!){
   saveEmailConfiguration(configurationInput:$configurationInput){
@@ -178,14 +205,14 @@ export const saveEmailConfiguration = `mutation SaveEmailConfiguration($configur
     password
     enableEmail
   }
-}`
+}`;
 export const saveFormEmailConfiguration = `mutation  SaveFormEmailConfiguration($configurationInput:FormEmailConfigurationInput!){
   saveFormEmailConfiguration(configurationInput: $configurationInput) {
     _id
     formEmail
 
   }
-}`
+}`;
 export const saveSendGridApiKey = `mutation SaveSendGridApiKey($configurationInput: SendGridConfigurationInput!) {
   saveSendGridConfiguration(configurationInput: $configurationInput) {
     _id
@@ -195,7 +222,7 @@ export const saveSendGridApiKey = `mutation SaveSendGridApiKey($configurationInp
     sendGridEmailName
     sendGridPassword
   }
-}`
+}`;
 
 export const saveFirebaseConfiguration = `
   mutation SaveFirebaseConfiguration(
@@ -212,7 +239,7 @@ export const saveFirebaseConfiguration = `
       measurementId
     }
   }
-`
+`;
 
 export const saveSentryConfiguration = `
   mutation SaveSentryConfiguration($configurationInput: SentryConfigurationInput!) {
@@ -226,7 +253,7 @@ export const saveSentryConfiguration = `
       riderAppSentryUrl
     }
   }
-`
+`;
 export const saveGoogleApiKeyConfiguration = `
   mutation SaveGoogleApiKeyConfiguration(
     $configurationInput: GoogleApiKeyConfigurationInput!
@@ -236,7 +263,7 @@ export const saveGoogleApiKeyConfiguration = `
       googleApiKey
     }
   }
-`
+`;
 export const saveCloudinaryConfiguration = `mutation SaveCloudinaryConfiguration($configurationInput: CloudinaryConfigurationInput!) {
   saveCloudinaryConfiguration(configurationInput: $configurationInput) {
     _id
@@ -245,7 +272,7 @@ export const saveCloudinaryConfiguration = `mutation SaveCloudinaryConfiguration
  
   }
 }
-`
+`;
 export const saveAmplitudeApiKeyConfiguration = `
   mutation SaveAmplitudeApiKeyConfiguration(
     $configurationInput: AmplitudeApiKeyConfigurationInput!
@@ -256,7 +283,7 @@ export const saveAmplitudeApiKeyConfiguration = `
       appAmplitudeApiKey
     }
   }
-`
+`;
 export const saveGoogleClientIDConfiguration = `mutation SaveGoogleClientIDConfiguration($configurationInput: GoogleClientIDConfigurationInput!) {
   saveGoogleClientIDConfiguration(configurationInput: $configurationInput) {
     _id
@@ -266,7 +293,7 @@ export const saveGoogleClientIDConfiguration = `mutation SaveGoogleClientIDConfi
     expoClientID
   }
 }
-`
+`;
 export const saveWebConfiguration = `
   mutation SaveWebConfiguration($configurationInput: WebConfigurationInput!) {
     saveWebConfiguration(configurationInput: $configurationInput) {
@@ -276,7 +303,7 @@ export const saveWebConfiguration = `
       googleColor
     }
   }
-`
+`;
 
 export const saveAppConfiguration = `
   mutation SaveAppConfiguration($configurationInput: AppConfigurationsInput!) {
@@ -288,7 +315,7 @@ export const saveAppConfiguration = `
       testOtp
     }
   }
-`
+`;
 export const saveDeliveryRateConfiguration = `mutation SaveDeliveryRateConfiguration($configurationInput: DeliveryCostConfigurationInput!) {
   saveDeliveryRateConfiguration(configurationInput: $configurationInput) {
     _id
@@ -304,7 +331,7 @@ export const savePaypalConfiguration = `mutation SavePaypalConfiguration($config
     clientSecret
     sandbox
   }
-}`
+}`;
 
 export const saveStripeConfiguration = `mutation SaveStripeConfiguration($configurationInput:StripeConfigurationInput!){
   saveStripeConfiguration(configurationInput:$configurationInput){
@@ -313,7 +340,7 @@ export const saveStripeConfiguration = `mutation SaveStripeConfiguration($config
     secretKey
   
   }
-}`
+}`;
 
 export const saveTwilioConfiguration = `mutation saveTwilioConfiguration($configurationInput:TwilioConfigurationInput!){
   saveTwilioConfiguration(configurationInput:$configurationInput){
@@ -323,14 +350,14 @@ export const saveTwilioConfiguration = `mutation saveTwilioConfiguration($config
     twilioPhoneNumber
     twilioEnabled
   }
-}`
+}`;
 
 export const saveVerificationToggles = `mutation SaveVerificationsToggle($configurationInput:VerificationConfigurationInput!){
   saveVerificationsToggle(configurationInput: $configurationInput) {
     skipEmailVerification
     skipMobileVerification
   }
-}`
+}`;
 
 export const saveCurrencyConfiguration = `mutation SaveCurrencyConfiguration($configurationInput:CurrencyConfigurationInput!){
   saveCurrencyConfiguration(configurationInput:$configurationInput){
@@ -338,7 +365,7 @@ export const saveCurrencyConfiguration = `mutation SaveCurrencyConfiguration($co
     currency
     currencySymbol
   }
-}`
+}`;
 
 export const ownerLogin = `mutation ownerLogin($email:String!,$password:String!){
   ownerLogin(email:$email,password:$password){
@@ -354,7 +381,7 @@ export const ownerLogin = `mutation ownerLogin($email:String!,$password:String!)
       address
     }
   }
-}`
+}`;
 
 export const createSection = `mutation CreateSection($section:SectionInput!){
   createSection(section:$section){
@@ -366,7 +393,7 @@ export const createSection = `mutation CreateSection($section:SectionInput!){
         name
       }
     }
-}`
+}`;
 export const editSection = `mutation editSection($section:SectionInput!){
   editSection(section:$section){
       _id
@@ -377,15 +404,15 @@ export const editSection = `mutation editSection($section:SectionInput!){
         name
       }
     }
-}`
+}`;
 
 export const deleteSection = `mutation DeleteSection($id:String!){
   deleteSection(id:$id)
-}`
+}`;
 
 export const deleteVendor = `mutation DeleteVendor($id:String!){
   deleteVendor(id:$id)
-}`
+}`;
 
 export const updateOrderStatus = `mutation UpdateOrderStatus($id:String!,$status:String!,$reason:String){
   updateOrderStatus(id:$id,status:$status,reason:$reason){
@@ -393,27 +420,27 @@ export const updateOrderStatus = `mutation UpdateOrderStatus($id:String!,$status
     orderStatus
   }
 }
-`
+`;
 export const updateStatus = `mutation UpdateStatus($id:String!,$orderStatus:String!){
   updateStatus(id:$id,orderStatus:$orderStatus){
     _id
     orderStatus
   }
 }
-`
+`;
 
 export const uploadToken = `mutation UploadToken($id:String!,$pushToken:String!){
   uploadToken(id:$id,pushToken:$pushToken){
     _id
     pushToken
   }
-}`
+}`;
 
 export const resetPassword = `mutation ResetPassword($password:String!,$token:String!){
   resetPassword(password:$password,token:$token){
     result
   }
-}`
+}`;
 
 export const createRider = `
 mutation CreateRider($riderInput:RiderInput!){
@@ -430,7 +457,7 @@ mutation CreateRider($riderInput:RiderInput!){
         _id
       }
     }
-  }`
+  }`;
 
 export const editRider = `
     mutation EditRider($riderInput:RiderInput!){
@@ -445,20 +472,20 @@ export const editRider = `
             _id
           }
         }
-      }`
+      }`;
 export const deleteRider = `
       mutation DeleteRider($id:String!){
         deleteRider(id:$id){
           _id
         }
-      }`
+      }`;
 
 export const toggleAvailablity = `
       mutation ToggleRider($id:String){
         toggleAvailablity(id:$id){
           _id
         }
-}`
+}`;
 
 export const assignRider = ` mutation AssignRider($id:String!,$riderId:String!){
   assignRider(id:$id,riderId:$riderId){
@@ -469,7 +496,7 @@ export const assignRider = ` mutation AssignRider($id:String!,$riderId:String!){
       name
     }
   }
-}`
+}`;
 
 export const updatePaymentStatus = `mutation UpdatePaymentStatus($id:String!,$status:String!){
   updatePaymentStatus(id:$id,status:$status){
@@ -478,7 +505,7 @@ export const updatePaymentStatus = `mutation UpdatePaymentStatus($id:String!,$st
     paidAmount
   }
 }
-`
+`;
 
 export const createOffer = `mutation CreateOffer($offer:OfferInput!){
   createOffer(offer:$offer){
@@ -491,7 +518,7 @@ export const createOffer = `mutation CreateOffer($offer:OfferInput!){
         address
       }
     }
-}`
+}`;
 
 export const editOffer = `mutation EditOffer($offer:OfferInput!){
   editOffer(offer:$offer){
@@ -504,11 +531,11 @@ export const editOffer = `mutation EditOffer($offer:OfferInput!){
         address
       }
     }
-}`
+}`;
 
 export const deleteOffer = `mutation DeleteOffer($id:String!){
   deleteOffer(id:$id)
-}`
+}`;
 
 export const createOptions = `mutation CreateOptions($optionInput:CreateOptionInput){
   createOptions(optionInput:$optionInput){
@@ -520,7 +547,7 @@ export const createOptions = `mutation CreateOptions($optionInput:CreateOptionIn
       price
     }
   }
-}`
+}`;
 
 export const createAddons = `mutation CreateAddons($addonInput:AddonInput){
   createAddons(addonInput:$addonInput){
@@ -535,7 +562,7 @@ export const createAddons = `mutation CreateAddons($addonInput:AddonInput){
       }
       
     }
-}`
+}`;
 export const editAddon = `mutation editAddon($addonInput:editAddonInput){
   editAddon(addonInput:$addonInput){
       _id
@@ -548,7 +575,7 @@ export const editAddon = `mutation editAddon($addonInput:editAddonInput){
         quantityMaximum
       }
   }
-}`
+}`;
 
 export const deleteAddon = `
       mutation DeleteAddon($id:String!,$restaurant:String!){
@@ -563,7 +590,7 @@ export const deleteAddon = `
             quantityMaximum
           }
         }
-      }`
+      }`;
 
 export const deleteOption = `
       mutation DeleteOption($id:String!,$restaurant:String!){
@@ -576,7 +603,7 @@ export const deleteOption = `
             price
           }
         }
-      }`
+      }`;
 export const editOption = `mutation editOption($optionInput:editOptionInput){
   editOption(optionInput:$optionInput){
           _id
@@ -587,7 +614,7 @@ export const editOption = `mutation editOption($optionInput:editOptionInput){
             price
           }
         }
-      }`
+      }`;
 
 export const createCoupon = `mutation CreateCoupon($couponInput:CouponInput!){
   createCoupon(couponInput:$couponInput){
@@ -596,7 +623,7 @@ export const createCoupon = `mutation CreateCoupon($couponInput:CouponInput!){
     discount
     enabled
   }
-}`
+}`;
 export const editCoupon = `mutation editCoupon($couponInput:CouponInput!){
   editCoupon(couponInput:$couponInput){
         _id
@@ -604,10 +631,10 @@ export const editCoupon = `mutation editCoupon($couponInput:CouponInput!){
         discount
         enabled
         }
-      }`
+      }`;
 export const deleteCoupon = `mutation DeleteCoupon($id:String!){
         deleteCoupon(id:$id)
-      }`
+      }`;
 
 export const createCuisine = `mutation CreateCuisine($cuisineInput:CuisineInput!){
         createCuisine(cuisineInput:$cuisineInput){
@@ -617,7 +644,7 @@ export const createCuisine = `mutation CreateCuisine($cuisineInput:CuisineInput!
           image
         shopType
         }
-      }`
+      }`;
 export const editCuisine = `mutation editCuisine($cuisineInput:CuisineInput!){
         editCuisine(cuisineInput:$cuisineInput){
           _id
@@ -626,10 +653,10 @@ export const editCuisine = `mutation editCuisine($cuisineInput:CuisineInput!){
           image
       shopType
               }
-            }`
+            }`;
 export const deleteCuisine = `mutation DeleteCuisine($id:String!){
               deleteCuisine(id:$id)
-            }`
+            }`;
 
 export const createBanner = `mutation CreateBanner($bannerInput:BannerInput!){
   createBanner(bannerInput:$bannerInput){
@@ -641,7 +668,7 @@ export const createBanner = `mutation CreateBanner($bannerInput:BannerInput!){
     screen
     parameters
   }
-}`
+}`;
 
 export const editBanner = `mutation editBanner($bannerInput:BannerInput!){
   editBanner(bannerInput:$bannerInput){
@@ -653,11 +680,11 @@ export const editBanner = `mutation editBanner($bannerInput:BannerInput!){
     screen
     parameters
   }
-}`
+}`;
 
 export const deleteBanner = `mutation DeleteBanner($id:String!){
   deleteBanner(id:$id)
-}`
+}`;
 
 export const createTipping = `mutation CreateTipping($tippingInput:TippingInput!){
         createTipping(tippingInput:$tippingInput){
@@ -665,7 +692,7 @@ export const createTipping = `mutation CreateTipping($tippingInput:TippingInput!
           tipVariations
           enabled
         }
-      }`
+      }`;
 
 export const editTipping = `mutation editTipping($tippingInput:TippingInput!){
   editTipping(tippingInput:$tippingInput){
@@ -673,7 +700,7 @@ export const editTipping = `mutation editTipping($tippingInput:TippingInput!){
             tipVariations
             enabled
               }
-            }`
+            }`;
 
 export const createTaxation = `mutation CreateTaxation($taxationInput:TaxationInput!){
     createTaxation(taxationInput:$taxationInput){
@@ -681,7 +708,7 @@ export const createTaxation = `mutation CreateTaxation($taxationInput:TaxationIn
         taxationCharges
         enabled
         }
-      }`
+      }`;
 
 export const editTaxation = `mutation editTaxation($taxationInput:TaxationInput!){
     editTaxation(taxationInput:$taxationInput){
@@ -689,7 +716,7 @@ export const editTaxation = `mutation editTaxation($taxationInput:TaxationInput!
             taxationCharges
             enabled
               }
-            }`
+            }`;
 
 export const createVendor = `mutation CreateVendor($vendorInput:VendorInput){
     createVendor(vendorInput:$vendorInput){
@@ -697,14 +724,14 @@ export const createVendor = `mutation CreateVendor($vendorInput:VendorInput){
       email
       userType
     }
-}`
+}`;
 
 export const editVendor = `mutation EditVendor($vendorInput:VendorInput){
   editVendor(vendorInput:$vendorInput){
     _id
     email
   }
-}`
+}`;
 
 export const editRestaurant = `mutation EditRestaurant($restaurantInput:RestaurantProfileInput!){
     editRestaurant(restaurant:$restaurantInput){
@@ -731,7 +758,7 @@ export const editRestaurant = `mutation EditRestaurant($restaurantInput:Restaura
       }
       shopType
     }
-}`
+}`;
 
 export const createZone = `mutation CreateZone($zone:ZoneInput!){
   createZone(zone:$zone){
@@ -741,7 +768,7 @@ export const createZone = `mutation CreateZone($zone:ZoneInput!){
     location{coordinates}
     isActive
   }
-}`
+}`;
 
 export const editZone = `mutation EditZone($zone:ZoneInput!){
   editZone(zone:$zone){
@@ -751,7 +778,7 @@ export const editZone = `mutation EditZone($zone:ZoneInput!){
     location{coordinates}
     isActive
   }
-}`
+}`;
 
 export const deleteZone = `mutation DeleteZone($id:String!){
   deleteZone(id:$id){
@@ -761,18 +788,18 @@ export const deleteZone = `mutation DeleteZone($id:String!){
     location{coordinates}
     isActive
   }
-}`
+}`;
 
 export const vendorResetPassword = `mutation VendorResetPassword($oldPassword: String!, $newPassword: String!){
     vendorResetPassword(oldPassword: $oldPassword, newPassword: $newPassword)
-}`
+}`;
 
 export const deleteRestaurant = `mutation DeltetRestaurant($id:String!){
   deleteRestaurant(id:$id){
     _id
     isActive
   }
-}`
+}`;
 
 export const updateTimings = `mutation UpdateTimings($id:String!,$openingTimes:[TimingsInput]){
   updateTimings(id:$id,
@@ -786,18 +813,18 @@ export const updateTimings = `mutation UpdateTimings($id:String!,$openingTimes:[
       }
     }
   }
-}`
+}`;
 
 export const sendNotificationUser = `mutation SendNotificationUser($notificationTitle:String, $notificationBody: String!){
   sendNotificationUser(notificationTitle:$notificationTitle,notificationBody:$notificationBody)
 }
-`
+`;
 export const updateCommission = `mutation UpdateCommission($id:String!,$commissionRate:Float!){
   updateCommission(id:$id,commissionRate:$commissionRate){
     _id
     commissionRate
   }
-}`
+}`;
 export const createRestaurant = `mutation CreateRestaurant($restaurant:RestaurantInput!,$owner:ID!){
   createRestaurant(restaurant:$restaurant,owner:$owner){
     _id
@@ -816,7 +843,7 @@ export const createRestaurant = `mutation CreateRestaurant($restaurant:Restauran
     shopType
     cuisines
   }
-}`
+}`;
 
 export const updateDeliveryBoundsAndLocation = `mutation UPDATE_DELIVERY_BOUNDS_AND_LOCATION($id:ID!,$bounds:[[[Float!]]],$location:CoordinatesInput!){
   result :updateDeliveryBoundsAndLocation(id:$id,location:$location,bounds:$bounds){
@@ -832,7 +859,7 @@ export const updateDeliveryBoundsAndLocation = `mutation UPDATE_DELIVERY_BOUNDS_
       }
     }
   }
-}`
+}`;
 
 export const updateWithdrawReqStatus = `mutation UpdateWithdrawRequest($id:ID!, $status:String!){
   updateWithdrawReqStatus(id:$id,status:$status){
@@ -849,4 +876,4 @@ export const updateWithdrawReqStatus = `mutation UpdateWithdrawRequest($id:ID!, 
       }
     }
   }
-}`
+}`;
