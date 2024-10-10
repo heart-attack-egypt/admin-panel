@@ -51,7 +51,8 @@ const Orders = () => {
           </tr>
         )}
         <OrdersData
-          orders={data && data.ordersByRestId}
+          orders={data && data.ordersByRestId.orders}
+          totalCounts={data && data.ordersByRestId.totalCount}
           toggleModal={toggleModal}
           subscribeToMore={subscribeToMore}
           loading={loadingQuery}

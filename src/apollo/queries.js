@@ -138,76 +138,92 @@ export const getOrdersByDateRange = `query GetOrdersByDateRange($startingDate: S
 
 export const getOrdersByRestaurant = `query ordersByRestId($restaurant:String!,$page:Int,$rows:Int,$search:String){
     ordersByRestId(restaurant:$restaurant,page:$page,rows:$rows,search:$search){
-      _id
-      orderId
-    instructions
-      restaurant{
+
+      totalCount
+      orders {
         _id
-        name
-        image
-        address
-        location{coordinates}
-      }
-      deliveryAddress{
-        location{coordinates}
-        deliveryAddress
-        details
-        label
-      }
-      items{
-        _id
-        title
-        description
-        image
-        quantity
-        variation{
+        orderId
+        instructions
+        paymentMethod
+        paidAmount
+        orderAmount
+        orderStatus
+        status
+        paymentStatus
+        reason
+        isActive
+        createdAt
+        deliveryCharges
+        tipping
+        taxationAmount
+
+        restaurant {
+          _id
+          name
+          image
+          address
+          location {
+            coordinates
+          }
+        }
+
+        deliveryAddress {
+          deliveryAddress
+          details
+          label
+          location {
+            coordinates
+          }
+        }
+
+        items {
           _id
           title
-          price
-          discounted
-        }
-        addons{
-          _id
-          options{
+          description
+          image
+          quantity
+          specialInstructions
+          isActive
+          createdAt
+          updatedAt
+
+          variation {
+            _id
+            title
+            price
+            discounted
+          }
+
+          addons {
             _id
             title
             description
-            price
+            quantityMinimum
+            quantityMaximum
+            options {
+              _id
+              title
+              description
+              price
+            }
           }
-          description
-          title
-          quantityMinimum
-          quantityMaximum
         }
-        specialInstructions
-        isActive
-        createdAt
-        updatedAt
+
+        user {
+          _id
+          name
+          phone
+          email
+        }
+
+        rider {
+          _id
+          name
+          username
+          available
+        }
       }
-      user{
-        _id
-        name
-        phone
-        email
-      }
-      paymentMethod
-      paidAmount
-      orderAmount
-      orderStatus
-      status
-      paymentStatus
-      reason
-      isActive
-      createdAt
-      deliveryCharges
-      tipping
-      taxationAmount
-      rider{
-        _id
-        name
-        username
-        available
-      }
+
     }
   }`;
 

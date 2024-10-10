@@ -12,9 +12,6 @@ import ReactToPrint, { useReactToPrint } from "react-to-print";
 import PrintIcon from "@mui/icons-material/Print";
 import { FormatReceipt } from "./format";
 
-const ORDERCOUNT = gql`
-  ${orderCount}
-`;
 const ORDER_PLACED = gql`
   ${subscribePlaceOrder}
 `;
@@ -46,10 +43,6 @@ const OrdersData = (props) => {
   };
 
   const restaurantId = localStorage.getItem("restaurantId");
-
-  const { data, loading: loadingQuery } = useQuery(ORDERCOUNT, {
-    variables: { restaurant: restaurantId },
-  });
 
   const handlePerRowsChange = (perPage, page) => {
     props.page(page);
@@ -285,7 +278,7 @@ const OrdersData = (props) => {
         dense
         data={props.orders || []}
         onRowClicked={props.toggleModal}
-        progressPending={props.loading || loadingQuery}
+        progressPending={props.loading}
         pointerOnHover
         highlightOnHover
         progressComponent={<CustomLoader />}
@@ -295,7 +288,7 @@ const OrdersData = (props) => {
         }
         pagination
         paginationServer
-        paginationTotalRows={data && data.orderCount}
+        paginationTotalRows={props.totalCounts}
         onChangeRowsPerPage={handlePerRowsChange}
         onChangePage={handlePageChange}
         conditionalRowStyles={conditionalRowStyles}
