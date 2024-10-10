@@ -15,9 +15,6 @@ import { useReactToPrint } from "react-to-print";
 import { FormatReceipt } from "./format";
 import PrintIcon from "@mui/icons-material/Print";
 
-const ORDERCOUNT = gql`
-  ${orderCount}
-`;
 const AllOrdersData = (props) => {
   const theme = useTheme();
   const { t } = props;
@@ -44,10 +41,6 @@ const AllOrdersData = (props) => {
       )
       .join("\n");
   };
-
-  const { data, loading: loadingQuery } = useQuery(ORDERCOUNT, {
-    variables: { search: searchQuery },
-  });
 
   const propExists = (obj, path) => {
     return path.split(".").reduce((obj, prop) => {
@@ -258,7 +251,7 @@ const AllOrdersData = (props) => {
         columns={columns}
         data={props.orders}
         onRowClicked={props.toggleModal}
-        progressPending={props.loading || loadingQuery}
+        progressPending={props.loading}
         pointerOnHover
         progressComponent={<CustomLoader />}
         sortFunction={customSort}
@@ -268,7 +261,7 @@ const AllOrdersData = (props) => {
         }
         pagination
         paginationServer
-        paginationTotalRows={data && data.orderCount}
+        paginationTotalRows={props.totalCounts}
         onChangeRowsPerPage={handlePerRowsChange}
         onChangePage={handlePageChange}
         conditionalRowStyles={conditionalRowStyles}
