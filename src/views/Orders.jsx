@@ -31,6 +31,7 @@ const Orders = () => {
       page: page - 1,
       rows: rowsPerPage,
       search: search,
+      skip: search?.length < 5,
     },
   });
   const toggleModal = (order) => {

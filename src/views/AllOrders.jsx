@@ -27,6 +27,7 @@ const Orders = () => {
       variables: {
         page: page - 1,
         search: searchQuery, // Pass the search query to the query variables
+        skip: searchQuery?.length < 5,
       },
     }
   );
