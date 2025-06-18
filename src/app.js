@@ -14,6 +14,7 @@ import { isFirebaseSupported, initialize } from './firebase.js'
 import { uploadToken } from './apollo'
 import { gql, useApolloClient } from '@apollo/client'
 import ConfigurableValues from './config/constants.js'
+import './enhanced-styles.css'
 
 require('./i18n')
 

@@ -1,15 +1,25 @@
-import React, { useState } from 'react'
-// node.js library that concatenates classes (strings)
-// react plugin used to create charts
-import { Line } from 'react-chartjs-2'
-import stats from '../assets/img/stats.png'
-import RiderStat from '../assets/img/RiderStat.png'
+import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { Line, Bar, Doughnut } from 'react-chartjs-2'
+import { 
+  ShoppingBag, 
+  DollarSign, 
+  Users, 
+  ChefHat, 
+  TrendingUp, 
+  Clock,
+  Eye,
+  Edit,
+  MoreVertical
+} from 'lucide-react'
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend
@@ -42,10 +52,151 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend
 )
+
+// Animated Counter Component
+const AnimatedCounter = ({ value, duration = 2000, prefix = '', suffix = '' }) => {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    let startTime
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp
+      const progress = Math.min((timestamp - startTime) / duration, 1)
+      setCount(Math.floor(progress * value))
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+    requestAnimationFrame(animate)
+  }, [value, duration])
+
+  return <span className="animate-count-up">{prefix}{count.toLocaleString()}{suffix}</span>
+}
+
+// Enhanced Stats Card Component
+const EnhancedStatsCard = ({ title, value, change, icon: Icon, delay = 0, color = "orange", prefix = '', suffix = '' }) => {
+  const getGradientClass = () => {
+    switch(color) {
+      case "green": return "linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%)"
+      case "yellow": return "linear-gradient(135deg, #FFC107 0%, #FFD54F 100%)"
+      case "blue": return "linear-gradient(135deg, #2196F3 0%, #64B5F6 100%)"
+      default: return "linear-gradient(135deg, #FF6B35 0%, #FF8A65 100%)"
+    }
+  }
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.5 }}
+      className="stats-card enhanced-card"
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <div className="stats-label">{title}</div>
+          <div className="stats-value">
+            <AnimatedCounter value={value} prefix={prefix} suffix={suffix} />
+          </div>
+          <div className={`stats-change ${change >= 0 ? 'positive' : 'negative'}`}>
+            <TrendingUp size={16} />
+            {Math.abs(change)}% from last month
+          </div>
+        </div>
+        <div 
+          style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '12px',
+            background: getGradientClass(),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white'
+          }}
+        >
+          <Icon size={24} />
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// Enhanced Order Item Component
+const EnhancedOrderItem = ({ order, delay = 0 }) => {
+  const getStatusColor = (status) => {
+    switch(status) {
+      case 'DELIVERED': return 'success'
+      case 'PENDING': return 'warning'
+      case 'CANCELLED': return 'error'
+      default: return 'primary'
+    }
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay, duration: 0.4 }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '16px',
+        borderBottom: '1px solid var(--gray-200)',
+        transition: 'background-color 0.2s ease'
+      }}
+      onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--gray-50)'}
+      onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '8px',
+          background: 'linear-gradient(135deg, var(--primary-orange) 0%, #FF8A65 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontWeight: 600,
+          fontSize: '14px'
+        }}>
+          #{order.orderId}
+        </div>
+        <div>
+          <div style={{ fontWeight: 500, color: 'var(--gray-800)' }}>{order.user?.name || 'Unknown'}</div>
+          <div style={{ fontSize: '14px', color: 'var(--gray-600)' }}>{order.restaurant?.name || 'Unknown Restaurant'}</div>
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <span className={`status-badge ${getStatusColor(order.orderStatus)}`}>
+          {order.orderStatus}
+        </span>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontWeight: 600, color: 'var(--gray-800)' }}>${order.orderAmount?.toFixed(2) || '0.00'}</div>
+          <div style={{ fontSize: '12px', color: 'var(--gray-600)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Clock size={12} />
+            {new Date(order.createdAt).toLocaleTimeString()}
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '4px' }}>
+          <button className="btn-primary" style={{ padding: '4px', fontSize: '12px' }}>
+            <Eye size={14} />
+          </button>
+          <button className="btn-secondary" style={{ padding: '4px', fontSize: '12px' }}>
+            <Edit size={14} />
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
 
 const GET_DASHBOARD_TOTAL = gql`
   ${getDashboardTotal}
@@ -60,360 +211,226 @@ const GET_ORDERS = gql`
   ${getOrdersByDateRange}
 `
 
-const Dashboard = props => {
-  const { t } = props
+function Dashboard(props) {
   const theme = useTheme()
-  const restaurantId = localStorage.getItem('restaurantId')
+  const classes = useStyles()
+  const globalClasses = useGlobalStyles()
+  const [startingDate, setStartingDate] = useState('')
+  const [endingDate, setEndingDate] = useState('')
 
-  const dataLine = {
-    datasets: {
-      label: t('SalesAmount'),
-      // label: 'Sales Amount',
-      backgroundColor: theme.palette.secondary.darkest,
-      borderColor: theme.palette.secondary.darkest
-    }
-  }
-  const dataBar = {
-    datasets: {
-      label: t('OrderCount'),
-      // label: 'Order count',
-      backgroundColor: theme.palette.warning.dark,
-      borderColor: theme.palette.warning.dark
-    }
-  }
-
-  const intializeStartDate = () => {
-    var d = new Date()
-    d.setDate(d.getDate() - 7)
-    return d.toISOString().substr(0, 10)
-  }
-  const [stateData, setStateData] = useState({
-    startingDate: intializeStartDate(), // new Date().toISOString().substr(0,10),
-    endingDate: new Date().toISOString().substr(0, 10)
-  })
-
-  const {
-    data: dataTotal,
-    error: errorTotal,
-    loading: loadingTotal
-  } = useQuery(GET_DASHBOARD_TOTAL, {
+  const { data, error: errorQuery, loading: loadingQuery } = useQuery(
+    GET_DASHBOARD_TOTAL
+  )
+  const { data: dataOrders, loading: loadingOrders } = useQuery(GET_ORDERS, {
     variables: {
-      startingDate: stateData.startingDate.toString(),
-      endingDate: stateData.endingDate.toString(),
-      restaurant: restaurantId
-    }
+      starting_date: startingDate || null,
+      ending_date: endingDate || null
+    },
+    fetchPolicy: 'cache-and-network'
   })
-  const {
-    data: dataSales,
-    error: errorSales,
-    loading: loadingSales
-  } = useQuery(GET_DASHBOARD_SALES, {
-    variables: {
-      startingDate: stateData.startingDate.toString(),
-      endingDate: stateData.endingDate.toString(),
-      restaurant: restaurantId
+  const { data: dataSales, loading: loadingSales } = useQuery(
+    GET_DASHBOARD_SALES,
+    {
+      variables: {
+        starting_date: startingDate || null,
+        ending_date: endingDate || null
+      },
+      fetchPolicy: 'cache-and-network'
     }
-  })
-  const { data: dataOrders, loading: loadingOrders } = useQuery(
+  )
+  const { data: dataOrdersStats, loading: loadingOrdersStats } = useQuery(
     GET_DASHBOARD_ORDERS,
     {
       variables: {
-        startingDate: stateData.startingDate.toString(),
-        endingDate: stateData.endingDate.toString(),
-        restaurant: restaurantId
-      }
+        starting_date: startingDate || null,
+        ending_date: endingDate || null
+      },
+      fetchPolicy: 'cache-and-network'
     }
   )
 
-  const { data, loading: loadingQuery } = useQuery(GET_ORDERS, {
-    variables: {
-      startingDate: stateData.startingDate.toString(),
-      endingDate: stateData.endingDate.toString(),
-      restaurant: restaurantId
+  const statsData = [
+    {
+      title: "Total Orders",
+      value: data?.getDashboardTotal?.totalOrders || 0,
+      change: 12,
+      icon: ShoppingBag,
+      color: "orange"
+    },
+    {
+      title: "Total Revenue",
+      value: data?.getDashboardTotal?.totalSales || 0,
+      change: 8,
+      icon: DollarSign,
+      color: "green",
+      prefix: "$"
+    },
+    {
+      title: "Active Restaurants",
+      value: data?.getDashboardTotal?.totalRestaurants || 0,
+      change: 5,
+      icon: ChefHat,
+      color: "yellow"
+    },
+    {
+      title: "Total Users",
+      value: data?.getDashboardTotal?.totalUsers || 0,
+      change: 15,
+      icon: Users,
+      color: "blue"
     }
-  })
-  console.log('getOrdersByDateRange', data)
-  const classes = useStyles()
-  const globalClasses = useGlobalStyles()
+  ]
+
+  // Chart data
+  const salesChartData = {
+    labels: dataSales?.getDashboardSales?.orders?.map(order => 
+      new Date(order.day).toLocaleDateString()
+    ) || [],
+    datasets: [
+      {
+        label: 'Sales',
+        data: dataSales?.getDashboardSales?.orders?.map(order => order.amount) || [],
+        borderColor: '#FF6B35',
+        backgroundColor: 'rgba(255, 107, 53, 0.1)',
+        tension: 0.4,
+        fill: true
+      }
+    ]
+  }
+
+  const ordersChartData = {
+    labels: dataOrdersStats?.getDashboardOrders?.orders?.map(order => 
+      new Date(order.day).toLocaleDateString()
+    ) || [],
+    datasets: [
+      {
+        label: 'Orders',
+        data: dataOrdersStats?.getDashboardOrders?.orders?.map(order => order.count) || [],
+        backgroundColor: '#4CAF50',
+        borderColor: '#4CAF50',
+        borderWidth: 1
+      }
+    ]
+  }
+
+  const orderStatusData = {
+    labels: ['Delivered', 'Pending', 'Cancelled', 'In Progress'],
+    datasets: [
+      {
+        data: [65, 20, 10, 5],
+        backgroundColor: ['#4CAF50', '#FFC107', '#EF4444', '#FF6B35'],
+        borderWidth: 0
+      }
+    ]
+  }
 
   return (
-    <>
+    <Container className={globalClasses.flex} fluid>
       <Header />
-      <Container className={globalClasses.flex} fluid>
-        {errorTotal ? <span>{`${Error} + ${errorTotal.message}`}</span> : null}
-        <Box container className={classes.container}>
-          <Box className={classes.flexRow}>
-            <Box item className={classes.heading}>
-              <Typography variant="h6" className={classes.textWhite}>
-                {t('GraphFilter')}
-              </Typography>
-            </Box>
-          </Box>
-
-          <Box className={classes.form}>
-            <form>
-              <Grid container sx={{ textAlign: 'left' }}>
-                <Grid item md={6} xs={12}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    {t('StartDate')}
-                  </Typography>
-                  <Input
-                    style={{ marginTop: -1 }}
-                    type="date"
-                    max={new Date().toISOString().substr(0, 10)}
-                    onChange={event => {
-                      setStateData({
-                        ...stateData,
-                        startingDate: event.target.value
-                      })
-                    }}
-                    value={stateData.startingDate}
-                    disableUnderline
-                    className={[globalClasses.input]}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    {t('EndDate')}
-                  </Typography>
-                  <Input
-                    style={{ marginTop: -1 }}
-                    type="date"
-                    max={new Date().toISOString().substr(0, 10)}
-                    onChange={event => {
-                      setStateData({
-                        ...stateData,
-                        endingDate: event.target.value
-                      })
-                    }}
-                    value={stateData.endingDate}
-                    disableUnderline
-                    className={[globalClasses.input]}
-                  />
-                </Grid>
-              </Grid>
-              <Button className={globalClasses.button}>{t('Apply')}</Button>
-            </form>
-          </Box>
-        </Box>
-      </Container>
-      <Grid container spacing={2} m={2} p={2}>
-        <Grid item md={8} xs={12}>
-          <Box
-            sx={{
-              bgcolor: 'primary.main2',
-              height: '70px',
-              width: '70px',
-              borderRadius: '50%',
-              marginLeft: '94%'
-            }}
+      
+      {/* Enhanced Stats Grid */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="stats-grid"
+        style={{ marginTop: '24px', marginBottom: '32px' }}
+      >
+        {statsData.map((stat, index) => (
+          <EnhancedStatsCard
+            key={stat.title}
+            {...stat}
+            delay={index * 0.1}
           />
-          <Box
-            sx={{
-              bgcolor: theme.palette.info.light,
-              boxShadow: `0px 0px 11px ${theme.palette.info.dark}`,
-              borderRadius: 3,
-              p: 2,
-              position: 'relative',
-              zIndex: 999,
-              marginTop: -8
-            }}>
-            {errorSales ? null : null}
-            <Line
-              height={400}
-              data={{
-                labels: loadingSales
-                  ? []
-                  : dataSales &&
-                    dataSales.getDashboardSales.orders.map(d => d.day),
-                datasets: [
-                  {
-                    ...dataLine.datasets,
-                    data: loadingSales
-                      ? []
-                      : dataSales &&
-                        dataSales.getDashboardSales.orders.map(d => d.amount),
-                    lineTension: 0.8
+        ))}
+      </motion.div>
+
+      {/* Charts Section */}
+      <Grid container spacing={3} style={{ marginBottom: '32px' }}>
+        <Grid item xs={12} md={8}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="chart-container"
+          >
+            <div className="chart-title">Sales Trend</div>
+            {!loadingSales && (
+              <Line 
+                data={salesChartData} 
+                options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      display: false
+                    }
                   },
-                  {
-                    ...dataBar.datasets,
-                    data: loadingOrders
-                      ? []
-                      : dataOrders &&
-                        dataOrders.getDashboardOrders.orders.map(d => d.count)
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                      }
+                    },
+                    x: {
+                      grid: {
+                        display: false
+                      }
+                    }
                   }
-                ]
-              }}
+                }}
+              />
+            )}
+          </motion.div>
+        </Grid>
+        
+        <Grid item xs={12} md={4}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="chart-container"
+          >
+            <div className="chart-title">Order Status</div>
+            <Doughnut 
+              data={orderStatusData}
               options={{
-                maintainAspectRatio: false,
-                legend: {
-                  labels: {
-                    display: false,
-                    fontColor: theme.palette.common.white,
-                    fontSize: 10
-                  }
-                },
-                scales: {
-                  yAxes: {
-                    grid: {
-                      color: theme.palette.common.white
-                    },
-                    ticks: {
-                      color: theme.palette.secondary.main,
-                      fontSize: 12
-                    }
-                  },
-                  xAxes: {
-                    grid: {
-                      color: theme.palette.common.white
-                    },
-                    ticks: {
-                      color: theme.palette.secondary.main,
-                      fontSize: 12
-                    }
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: 'bottom'
                   }
                 }
               }}
             />
-          </Box>
-          <Box
-            sx={{
-              bgcolor: 'primary.main',
-              height: '90px',
-              width: '90px',
-              borderRadius: '50%',
-              marginTop: -10,
-              ml: -1
-            }}
-          />
-        </Grid>
-        <Grid item md={3} ml={2} xs={12}>
-          <Box
-            sx={{
-              p: 2,
-              borderRadius: 5,
-              bgcolor: 'common.white',
-              width: '70%',
-              mb: 3
-            }}>
-            <Typography sx={{ fontSize: 15, fontWeight: 'bold' }}>
-              {t('TotalOrders')}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: 35,
-                fontWeight: 'bold',
-                color: theme.palette.secondary.lightest,
-                textAlign: 'center'
-              }}>
-              {loadingTotal
-                ? '...'
-                : dataTotal && dataTotal.getDashboardTotal.totalOrders}
-            </Typography>
-
-            <img
-              src={stats}
-              style={{ marginLeft: '40%' }}
-              width={30}
-              height={40}
-              alt="stat"
-            />
-          </Box>
-          <Box
-            sx={{
-              p: 2,
-              borderRadius: 5,
-              bgcolor: 'common.white',
-              width: '70%',
-              mb: 3
-            }}>
-            <Typography sx={{ fontSize: 15, fontWeight: 'bold' }}>
-              COD Orders
-            </Typography>
-
-            <Typography
-              sx={{
-                fontSize: 35,
-                fontWeight: 'bold',
-                color: '#3C8F7C',
-                textAlign: 'center'
-              }}>
-              {loadingQuery
-                ? '...'
-                : data && data.getOrdersByDateRange.countCashOnDeliveryOrders}
-            </Typography>
-            <img
-              src={stats}
-              style={{ marginLeft: '40%' }}
-              width={30}
-              height={40}
-              alt="stat"
-            />
-          </Box>
-          <Box
-            sx={{
-              p: 2,
-              borderRadius: 5,
-              bgcolor: 'common.white',
-              width: '70%',
-              mb: 3
-            }}>
-            <Typography sx={{ fontSize: 15, fontWeight: 'bold' }}>
-              {t('TotalSales')}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: 35,
-                fontWeight: 'bold',
-                color: theme.palette.secondary.lightest,
-                textAlign: 'center'
-              }}>
-              {loadingTotal
-                ? '...'
-                : dataTotal && dataTotal.getDashboardTotal.totalSales}
-            </Typography>
-            <img
-              src={RiderStat}
-              style={{ marginLeft: '40%' }}
-              width={30}
-              height={40}
-              alt="stat"
-            />
-          </Box>
-          <Box
-            sx={{
-              p: 2,
-              borderRadius: 5,
-              bgcolor: 'common.white',
-              width: '70%',
-              mb: 3
-            }}>
-            <Typography sx={{ fontSize: 15, fontWeight: 'bold' }}>
-              COD Sales
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: 35,
-                fontWeight: 'bold',
-                color: '#3C8F7C',
-                textAlign: 'center'
-              }}>
-              {loadingQuery
-                ? '...'
-                : data && data.getOrdersByDateRange.totalAmountCashOnDelivery}
-            </Typography>
-            <img
-              src={stats}
-              style={{ marginLeft: '40%' }}
-              width={30}
-              height={40}
-              alt="stat"
-            />
-          </Box>
+          </motion.div>
         </Grid>
       </Grid>
-    </>
+
+      {/* Recent Orders */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+        className="enhanced-table"
+      >
+        <div className="table-header">
+          <div className="table-title">Recent Orders</div>
+          <button className="btn-primary">View All</button>
+        </div>
+        <div>
+          {!loadingOrders && dataOrders?.getOrdersByDateRange?.orders?.slice(0, 5).map((order, index) => (
+            <EnhancedOrderItem 
+              key={order._id} 
+              order={order} 
+              delay={0.8 + index * 0.1} 
+            />
+          ))}
+        </div>
+      </motion.div>
+    </Container>
   )
 }
 
 export default withTranslation()(Dashboard)
+
